@@ -4,7 +4,7 @@ import useSpeechRecognition from "@/hooks/useSpeechRecognition";
 import useSpeechSynthesis from "@/hooks/useSpeechSynthesis";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { handleVoiceCommand } from "@/lib/erpCommands";
+import { handleVoiceCommand } from "@/lib/qbsCommands";
 import { useErpContext } from "./ErpContext";
 
 export type VoiceState = "inactive" | "listening" | "processing" | "result";
@@ -171,7 +171,7 @@ export const VoiceProvider = ({ children }: { children: ReactNode }) => {
       });
 
       // Check connection and properly format it
-      console.log("Original ERP connection from context:", erpConnection);
+      console.log("Original QBS connection from context:", erpConnection);
       
       let formattedConnection = null;
       if (erpConnection) {
