@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -30,7 +30,7 @@ interface ErpContextType {
 
 const ErpContext = createContext<ErpContextType | undefined>(undefined);
 
-export const ErpProvider = ({ children }: { children: ReactNode }) => {
+export function ErpProvider({ children }: { children: ReactNode }) {
   const [isConnected, setIsConnected] = useState(false);
   const { toast } = useToast();
 
@@ -48,9 +48,9 @@ export const ErpProvider = ({ children }: { children: ReactNode }) => {
   });
 
   // Update connected state when connection data changes
-  React.useEffect(() => {
-    if (erpConnection && (erpConnection as ErpConnection).isActive) {
-      setIsConnected(true);
+  useEffect(() => {
+    if (erpConnection && typeof erpConnection === 'object' && 'isActive' in erpConnection) {
+      setIsConnected(Boolean(erpConnection.isActive));
     } else {
       setIsConnected(false);
     }
@@ -119,7 +119,7 @@ export const ErpProvider = ({ children }: { children: ReactNode }) => {
   return (
     <ErpContext.Provider
       value={{
-        erpConnection: erpConnection as ErpConnection,
+        erpConnection: erpConnection as ErpConnection || null,
         isConnected,
         testConnection,
         saveConnection,
@@ -129,12 +129,12 @@ export const ErpProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </ErpContext.Provider>
   );
-};
+}
 
-export const useErpContext = () => {
+export function useErpContext() {
   const context = useContext(ErpContext);
   if (context === undefined) {
     throw new Error("useErpContext must be used within an ErpProvider");
   }
   return context;
-};
+}

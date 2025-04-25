@@ -426,7 +426,14 @@ export class DatabaseStorage implements IStorage {
         icon: "insights",
         sortOrder: 4
       });
+      
+      // We're not creating a default ERP connection here
+      // It will be created by the user through the settings page
     }
+  }
+  
+  constructor() {
+    // Constructor for database storage - initializes database connection
   }
 }
 
