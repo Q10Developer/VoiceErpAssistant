@@ -39,7 +39,7 @@ const Dashboard = () => {
               </p>
             </div>
             <div className="mt-4">
-              <Link href="/erp-test">
+              <Link href="/qbs-test">
                 <Button className="bg-amber-600 hover:bg-amber-700 flex items-center">
                   <Server className="mr-2 h-4 w-4" />
                   Test & Fix QBS Connection

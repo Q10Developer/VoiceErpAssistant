@@ -21,7 +21,7 @@ function App() {
               <Route path="/" component={Dashboard} />
               <Route path="/history" component={CommandHistoryPage} />
               <Route path="/settings" component={SettingsPage} />
-              <Route path="/erp-test" component={ErpTestPage} />
+              <Route path="/qbs-test" component={ErpTestPage} />
               <Route component={NotFound} />
             </Switch>
           </Layout>
