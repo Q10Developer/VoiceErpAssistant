@@ -69,7 +69,7 @@ async function handleInventoryCheck(command: string, erpConnection: ErpConnectio
   logDebug("Handling inventory check command", { command, erpConnection });
   
   if (!erpConnection) {
-    return "You need to connect to ERPNext first. Please go to Settings and set up your connection.";
+    return "You need to connect to QBS first. Please go to Settings and set up your connection.";
   }
   
   const productName = extractProductName(command);
@@ -80,9 +80,9 @@ async function handleInventoryCheck(command: string, erpConnection: ErpConnectio
   }
   
   try {
-    logDebug("Calling ERPNext API for inventory", { productName });
+    logDebug("Calling QBS API for inventory", { productName });
     const response = await erpNextApi.getInventory(erpConnection, productName);
-    logDebug("ERPNext inventory response", response);
+    logDebug("QBS inventory response", response);
     
     if (response.success) {
       if (response.data.length === 0) {
@@ -107,7 +107,7 @@ async function handleCreateInvoice(command: string, erpConnection: ErpConnection
   logDebug("Handling create invoice command", { command, erpConnection });
   
   if (!erpConnection) {
-    return "You need to connect to ERPNext first. Please go to Settings and set up your connection.";
+    return "You need to connect to QBS first. Please go to Settings and set up your connection.";
   }
   
   const customerName = extractCustomerName(command);
@@ -118,9 +118,9 @@ async function handleCreateInvoice(command: string, erpConnection: ErpConnection
   }
   
   try {
-    logDebug("Calling ERPNext API to create invoice", { customerName });
+    logDebug("Calling QBS API to create invoice", { customerName });
     const response = await erpNextApi.createInvoice(erpConnection, customerName);
-    logDebug("ERPNext create invoice response", response);
+    logDebug("QBS create invoice response", response);
     
     if (response.success) {
       return `Sales invoice ${response.data.name || 'created'} for customer ${customerName}.`;
@@ -138,11 +138,11 @@ async function handleShowOpenOrders(erpConnection: ErpConnection | null): Promis
   logDebug("Handling show open orders command", { erpConnection });
   
   if (!erpConnection) {
-    return "You need to connect to ERPNext first. Please go to Settings and set up your connection.";
+    return "You need to connect to QBS first. Please go to Settings and set up your connection.";
   }
   
   try {
-    logDebug("Calling ERPNext API for open orders");
+    logDebug("Calling QBS API for open orders");
     const response = await erpNextApi.getOpenOrders(erpConnection);
     logDebug("ERPNext open orders response", response);
     
@@ -170,7 +170,7 @@ export async function handleVoiceCommand(command: string, erpConnection: ErpConn
   
   // Check if connected
   if (!erpConnection && !normalizedCommand.includes("help") && !normalizedCommand.includes("settings")) {
-    return "You need to connect to ERPNext first. Please go to Settings and set up your connection.";
+    return "You need to connect to QBS first. Please go to Settings and set up your connection.";
   }
   
   // Command: Check inventory
