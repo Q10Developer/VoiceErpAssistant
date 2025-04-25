@@ -21,7 +21,7 @@ const SimpleControls = () => {
   // Initialize speech recognition and synthesis
   useEffect(() => {
     // Browser compatibility check for SpeechRecognition
-    const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     
     // Initialize speech synthesis
     if (window.speechSynthesis) {
@@ -94,7 +94,7 @@ const SimpleControls = () => {
       setTranscript("");
       
       // Check for browser support again just to be safe
-      const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       
       if (!SpeechRecognition) {
         setResult("Speech recognition is not supported in your browser. Please try Chrome or Edge.");

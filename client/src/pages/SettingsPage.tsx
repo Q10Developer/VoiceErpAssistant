@@ -249,7 +249,7 @@ const SettingsPage = () => {
           
           <CardContent className="space-y-6">
             {isConnected && (
-              <Alert variant="success" className="bg-success/10 border-success text-success">
+              <Alert className="bg-success/10 border-success text-success">
                 <Check className="h-4 w-4" />
                 <AlertTitle>Connected to QBS</AlertTitle>
                 <AlertDescription>
@@ -313,7 +313,7 @@ const SettingsPage = () => {
             
             {/* Test result */}
             {testResult && (
-              <Alert variant={testResult.success ? "success" : "destructive"} className={testResult.success ? "bg-success/10 border-success" : "bg-error/10 border-error"}>
+              <Alert className={testResult.success ? "bg-success/10 border-success" : "bg-error/10 border-error"}>
                 {testResult.success ? (
                   <Check className="h-4 w-4" />
                 ) : (
