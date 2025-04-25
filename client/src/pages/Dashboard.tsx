@@ -1,4 +1,4 @@
-import VoiceCommandCard from "@/components/voice/VoiceCommandCard";
+// import VoiceCommandCard from "@/components/voice/VoiceCommandCard";
 import CommandHistory from "@/components/voice/CommandHistory";
 import QuickCommands from "@/components/voice/QuickCommands";
 import VoiceSettings from "@/components/voice/VoiceSettings";
@@ -16,7 +16,15 @@ const Dashboard = () => {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <VoiceCommandCard />
+        {/* Removed VoiceCommandCard to avoid speech recognition errors */}
+        <div className="md:col-span-2 bg-white p-6 rounded-lg shadow-sm border">
+          <h2 className="text-lg font-medium text-neutral-800 mb-4">Voice Command Center</h2>
+          <p className="text-neutral-600">
+            Use the controls above to manage voice commands. The simplified controls
+            allow you to start recording, stop recording, and process commands
+            with dedicated buttons.
+          </p>
+        </div>
         <CommandHistory />
       </div>
       
