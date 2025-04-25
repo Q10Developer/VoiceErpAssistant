@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Mic, Check, Settings } from "lucide-react";
+import { Mic, Check, Settings, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useVoiceContext } from "@/context/VoiceContext";
@@ -116,9 +116,7 @@ const VoiceCommandCard = () => {
           >
             <span className="mr-2">
               {isListening ? 
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-square">
-                  <rect width="18" height="18" x="3" y="3" rx="2" />
-                </svg>
+                <Square className="h-5 w-5" />
                 : 
                 <Mic className="h-5 w-5" />
               }

@@ -17,43 +17,28 @@ interface ErpResponse<T> {
   data: T;
 }
 
-// Mock responses for development without actual ERPNext instance
-const mockResponses = {
-  inventory: [
-    { item_code: "XYZ", item_name: "Product XYZ", actual_qty: 42, warehouse: "Stores" },
-    { item_code: "ABC", item_name: "Product ABC", actual_qty: 15, warehouse: "Stores" }
-  ],
-  invoice: { name: "SINV-2023-00001", customer: "ABC Corp", grand_total: 1250.00 },
-  openOrders: [
-    { name: "SO-2023-00005", customer: "ABC Corp", grand_total: 1250.00, status: "To Deliver" },
-    { name: "SO-2023-00004", customer: "XYZ Ltd", grand_total: 899.50, status: "To Deliver and Bill" }
-  ]
-};
+// We no longer use mock data - all requests will go to the actual ERPNext instance
 
 // ERP API service
 export const erpNextApi = {
   // Get inventory information for a product
   async getInventory(connection: ErpConnection, productName: string): Promise<ErpResponse<any[]>> {
     try {
-      // In a real implementation, we would make an actual API call to ERPNext
-      // For now, we'll use our proxy endpoint with mock data
+      // Make actual API call to ERPNext through our proxy endpoint
       const response = await apiRequest("POST", "/api/erp/query", {
-        userId: 1,
+        userId: connection.userId,
+        connectionId: connection.id,
         method: "get_list",
         doctype: "Bin",
         filters: [["item_name", "like", `%${productName}%`]],
         fields: ["item_code", "item_name", "actual_qty", "warehouse"]
       });
       
-      // This would be replaced with actual API call in production
-      // Using mock data for demonstration
-      const mockData = mockResponses.inventory.filter(item => 
-        item.item_name.toLowerCase().includes(productName.toLowerCase())
-      );
+      const data = await response.json();
       
       return {
         success: true,
-        data: mockData
+        data: data.items || []
       };
     } catch (error) {
       return {
@@ -67,18 +52,29 @@ export const erpNextApi = {
   // Create invoice for a customer
   async createInvoice(connection: ErpConnection, customerName: string): Promise<ErpResponse<any>> {
     try {
-      // In a real implementation, this would create an invoice via ERPNext API
-      // For now, we'll simulate success and return mock data
+      // Make actual API call to ERPNext through our proxy endpoint
+      const response = await apiRequest("POST", "/api/erp/create", {
+        userId: connection.userId,
+        connectionId: connection.id,
+        doctype: "Sales Invoice",
+        doc: {
+          customer: customerName,
+          is_pos: 0,
+          items: [
+            {
+              item_code: "Standard Product", // This should be replaced with actual item code
+              qty: 1
+            }
+          ]
+        }
+      });
       
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const data = await response.json();
       
       return {
-        success: true,
-        data: {
-          ...mockResponses.invoice,
-          customer: customerName
-        }
+        success: data.success || false,
+        message: data.message,
+        data: data.doc || {}
       };
     } catch (error) {
       return {
@@ -92,15 +88,21 @@ export const erpNextApi = {
   // Get list of open orders
   async getOpenOrders(connection: ErpConnection): Promise<ErpResponse<any[]>> {
     try {
-      // In a real implementation, we would fetch open orders from ERPNext
-      // For now, we'll use mock data
+      // Make actual API call to ERPNext through our proxy endpoint
+      const response = await apiRequest("POST", "/api/erp/query", {
+        userId: connection.userId,
+        connectionId: connection.id,
+        method: "get_list",
+        doctype: "Sales Order",
+        filters: [["status", "not in", "Completed,Cancelled,Closed"]],
+        fields: ["name", "customer", "grand_total", "status", "transaction_date"]
+      });
       
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 800));
+      const data = await response.json();
       
       return {
         success: true,
-        data: mockResponses.openOrders
+        data: data.items || []
       };
     } catch (error) {
       return {
