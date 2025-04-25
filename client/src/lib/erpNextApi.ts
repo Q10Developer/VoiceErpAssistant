@@ -2,8 +2,13 @@ import axios from "axios";
 import { apiRequest } from "./queryClient";
 
 interface ErpConnection {
+  id?: number;
+  userId: number;
   url: string;
   apiKey: string;
+  apiSecret: string;
+  isActive: boolean;
+  lastConnected?: Date;
 }
 
 interface ErpResponse<T> {

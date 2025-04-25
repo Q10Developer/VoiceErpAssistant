@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -8,6 +8,7 @@ interface ErpConnection {
   userId: number;
   url: string;
   apiKey: string;
+  apiSecret: string;
   isActive: boolean;
   lastConnected?: Date;
 }
@@ -43,18 +44,17 @@ export const ErpProvider = ({ children }: { children: ReactNode }) => {
     refetch 
   } = useQuery({
     queryKey: [`/api/connection/${userId}`],
-    enabled: !!userId,
-    onSuccess: (data) => {
-      if (data && data.isActive) {
-        setIsConnected(true);
-      } else {
-        setIsConnected(false);
-      }
-    },
-    onError: () => {
+    enabled: !!userId
+  });
+
+  // Update connected state when connection data changes
+  React.useEffect(() => {
+    if (erpConnection && (erpConnection as ErpConnection).isActive) {
+      setIsConnected(true);
+    } else {
       setIsConnected(false);
     }
-  });
+  }, [erpConnection]);
 
   // Test ERP connection
   const testConnectionMutation = useMutation({
