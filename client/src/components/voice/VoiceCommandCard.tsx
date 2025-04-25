@@ -13,7 +13,8 @@ const VoiceCommandCard = () => {
     stopListening, 
     recognizedText, 
     resultText,
-    isListening
+    isListening,
+    processCommand
   } = useVoiceContext();
   
   const { isConnected } = useErpContext();
@@ -104,19 +105,44 @@ const VoiceCommandCard = () => {
           )}
         </div>
         
-        {/* Action button */}
-        <div className="flex justify-center">
+        {/* Action buttons */}
+        <div className="flex justify-center gap-4">
           <Button 
             size="lg" 
             onClick={handleToggleMic}
             disabled={!isConnected && voiceState === "inactive"}
             className={`px-4 py-2 ${isListening ? 'bg-error hover:bg-error/90' : 'bg-primary hover:bg-primary/90'}`}
+            variant={isListening ? "destructive" : "default"}
           >
-            <span className="material-icons mr-2">
-              {isListening ? 'stop' : 'mic'}
+            <span className="mr-2">
+              {isListening ? 
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-square">
+                  <rect width="18" height="18" x="3" y="3" rx="2" />
+                </svg>
+                : 
+                <Mic className="h-5 w-5" />
+              }
             </span>
             {buttonText}
           </Button>
+          
+          {isListening && voiceState === "listening" && (
+            <Button
+              size="lg"
+              onClick={() => {
+                stopListening();
+                if (recognizedText.trim()) {
+                  processCommand(recognizedText.trim());
+                }
+              }}
+              className="px-4 py-2 bg-success hover:bg-success/90"
+            >
+              <span className="mr-2">
+                <Check className="h-5 w-5" />
+              </span>
+              Process Command
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>
