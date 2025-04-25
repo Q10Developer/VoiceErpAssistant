@@ -369,7 +369,7 @@ const SimpleControls = () => {
           setResult("No valid QBS connection found. Please configure your connection in settings.");
         }
       } 
-      // Non-ERP command
+      // Non-QBS command
       else {
         setResult(`Processed command: "${inputText}"`);
       }
@@ -381,6 +381,40 @@ const SimpleControls = () => {
         response: result,
         status: "success"
       });
+      
+      // Prepare speech text - clean it up for better speech synthesis
+      const speechText = result;
+      
+      // Speak the result if speech is enabled
+      if (isSpeechEnabled && speechSynthesisRef.current && !isSpeaking) {
+        try {
+          const utterance = new SpeechSynthesisUtterance(speechText);
+          utterance.rate = 1.0;
+          utterance.pitch = 1.0;
+          utterance.volume = 1.0;
+          
+          // Add event handlers
+          utterance.onstart = () => {
+            setIsSpeaking(true);
+            console.log("Speech synthesis started");
+          };
+          
+          utterance.onend = () => {
+            setIsSpeaking(false);
+            console.log("Speech synthesis ended");
+          };
+          
+          utterance.onerror = (event) => {
+            console.error("Speech synthesis error:", event);
+            setIsSpeaking(false);
+          };
+          
+          // Speak the text
+          speechSynthesisRef.current.speak(utterance);
+        } catch (error) {
+          console.error("Error speaking:", error);
+        }
+      }
       
       setIsProcessing(false);
     } catch (error) {
@@ -536,7 +570,24 @@ const SimpleControls = () => {
           <Card className="overflow-hidden border-2 border-blue-100 shadow-md">
             <CardContent className="p-5">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-medium text-blue-800">Response</h3>
+                <div className="flex items-center">
+                  <h3 className="font-medium text-blue-800 mr-3">Response</h3>
+                  <button 
+                    className="flex items-center text-sm text-gray-600 hover:text-blue-700"
+                    onClick={() => setIsSpeechEnabled(!isSpeechEnabled)}
+                    title={isSpeechEnabled ? "Disable voice responses" : "Enable voice responses"}
+                  >
+                    {isSpeechEnabled ? (
+                      <Volume2 className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <VolumeX className="h-4 w-4 text-gray-500" />
+                    )}
+                    <span className="ml-1 text-xs">{isSpeechEnabled ? "Speech On" : "Speech Off"}</span>
+                  </button>
+                  {isSpeaking && (
+                    <span className="ml-2 text-xs text-blue-500 animate-pulse">Speaking...</span>
+                  )}
+                </div>
                 {isProcessing && (
                   <div className="flex space-x-1">
                     <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
