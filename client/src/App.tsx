@@ -5,14 +5,14 @@ import Layout from "@/components/layout/Layout";
 import Dashboard from "@/pages/Dashboard";
 import CommandHistoryPage from "@/pages/CommandHistoryPage";
 import SettingsPage from "@/pages/SettingsPage";
-import ErpTestPage from "@/pages/ErpTestPage";
+import QbsTestPage from "@/pages/QbsTestPage";
 import NotFound from "@/pages/not-found";
 import { VoiceProvider } from "@/context/VoiceContext";
-import { ErpProvider } from "@/context/ErpContext";
+import { QbsProvider } from "@/context/QbsContext";
 
 function App() {
   return (
-    <ErpProvider>
+    <QbsProvider>
       <VoiceProvider>
         <TooltipProvider>
           <Toaster />
@@ -21,13 +21,13 @@ function App() {
               <Route path="/" component={Dashboard} />
               <Route path="/history" component={CommandHistoryPage} />
               <Route path="/settings" component={SettingsPage} />
-              <Route path="/qbs-test" component={ErpTestPage} />
+              <Route path="/qbs-test" component={QbsTestPage} />
               <Route component={NotFound} />
             </Switch>
           </Layout>
         </TooltipProvider>
       </VoiceProvider>
-    </ErpProvider>
+    </QbsProvider>
   );
 }
 

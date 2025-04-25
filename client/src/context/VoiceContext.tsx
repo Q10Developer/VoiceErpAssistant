@@ -5,7 +5,7 @@ import useSpeechSynthesis from "@/hooks/useSpeechSynthesis";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { handleVoiceCommand } from "@/lib/qbsCommands";
-import { useErpContext } from "./ErpContext";
+import { useQbsContext } from "./QbsContext";
 
 export type VoiceState = "inactive" | "listening" | "processing" | "result";
 
@@ -50,7 +50,7 @@ export const VoiceProvider = ({ children }: { children: ReactNode }) => {
   const [recognizedText, setRecognizedText] = useState("");
   const [resultText, setResultText] = useState("");
   const { toast } = useToast();
-  const { erpConnection } = useErpContext();
+  const { qbsConnection } = useQbsContext();
   
   // Default user ID - would come from auth in a real app
   const userId = 1;
@@ -171,18 +171,18 @@ export const VoiceProvider = ({ children }: { children: ReactNode }) => {
       });
 
       // Check connection and properly format it
-      console.log("Original QBS connection from context:", erpConnection);
+      console.log("Original QBS connection from context:", qbsConnection);
       
       let formattedConnection = null;
-      if (erpConnection) {
+      if (qbsConnection) {
         formattedConnection = {
-          id: erpConnection.id,
-          userId: erpConnection.userId,
-          url: erpConnection.url,
-          apiKey: erpConnection.apiKey,
-          apiSecret: erpConnection.apiSecret,
-          isActive: erpConnection.isActive,
-          lastConnected: erpConnection.lastConnected
+          id: qbsConnection.id,
+          userId: qbsConnection.userId,
+          url: qbsConnection.url,
+          apiKey: qbsConnection.apiKey,
+          apiSecret: qbsConnection.apiSecret,
+          isActive: qbsConnection.isActive,
+          lastConnected: qbsConnection.lastConnected
         };
         console.log("Formatted connection for command processor:", formattedConnection);
       }

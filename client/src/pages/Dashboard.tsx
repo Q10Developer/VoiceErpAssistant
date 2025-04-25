@@ -5,7 +5,7 @@ import VoiceSettings from "@/components/voice/VoiceSettings";
 import HelpPanel from "@/components/voice/HelpPanel";
 import BasicControls from "@/components/voice/BasicControls";
 import SimpleControls from "@/components/voice/SimpleControls";
-import ErpDirectTest from "@/components/erp/ErpDirectTest";
+import QbsDirectTest from "@/components/qbs/QbsDirectTest";
 import { Link } from "wouter";
 import { AlertTriangle, Server } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -65,7 +65,7 @@ const Dashboard = () => {
       
       {/* QBS Direct API Test */}
       <div className="mt-6">
-        <ErpDirectTest />
+        <QbsDirectTest />
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">

@@ -1,5 +1,5 @@
 import { Bell, HelpCircle, Menu } from "lucide-react";
-import { useErpContext } from "@/context/ErpContext";
+import { useQbsContext } from "@/context/QbsContext";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -8,7 +8,7 @@ interface HeaderProps {
 }
 
 const Header = ({ toggleSidebar }: HeaderProps) => {
-  const { isConnected } = useErpContext();
+  const { isConnected } = useQbsContext();
   
   return (
     <header className="bg-white shadow-sm">
@@ -25,7 +25,7 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
         
         <div className="flex items-center md:hidden">
           <span className="material-icons mr-2 text-primary">voice_over</span>
-          <h1 className="text-lg font-medium text-primary">Voice ERP</h1>
+          <h1 className="text-lg font-medium text-primary">Voice QBS</h1>
         </div>
         
         <div className="flex items-center gap-2">
