@@ -4,6 +4,9 @@ import QuickCommands from "@/components/voice/QuickCommands";
 import VoiceSettings from "@/components/voice/VoiceSettings";
 import HelpPanel from "@/components/voice/HelpPanel";
 import BasicControls from "@/components/voice/BasicControls";
+import { Link } from "wouter";
+import { AlertTriangle, Server } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Dashboard = () => {
   return (

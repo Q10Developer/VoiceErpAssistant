@@ -7,7 +7,8 @@ import {
   Archive, 
   Receipt, 
   UserPlus, 
-  ShoppingCart 
+  ShoppingCart,
+  Server
 } from "lucide-react";
 
 interface SidebarProps {
@@ -94,6 +95,19 @@ const Sidebar = ({ open, setOpen }: SidebarProps) => {
           
           <h2 className="text-sm uppercase tracking-wider text-white/60 mt-6 mb-2">Shortcuts</h2>
           <ul>
+            <li className="mb-1">
+              <Link 
+                href="/erp-test" 
+                onClick={handleLinkClick}
+                className={cn(
+                  "flex items-center p-2 rounded text-white/80 hover:text-white hover:bg-white/10",
+                  location === "/erp-test" && "bg-white/10 text-white font-medium"
+                )}
+              >
+                <Server className="mr-3 h-5 w-5 text-yellow-400" />
+                ERPNext Test Tool
+              </Link>
+            </li>
             <li className="mb-1">
               <a href="#" className="flex items-center p-2 rounded hover:bg-white/10 text-white/80 hover:text-white">
                 <Archive className="mr-3 h-5 w-5" />
