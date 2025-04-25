@@ -19,8 +19,8 @@ const SettingsPage = () => {
   // Voice settings state
   const [wakeWord, setWakeWord] = useState(voiceSettings?.wakeWord || "Hey QBS");
   const [sensitivity, setSensitivity] = useState<number[]>([voiceSettings?.sensitivity || 7]);
-  const [voiceResponse, setVoiceResponse] = useState(voiceSettings?.voiceResponse || true);
-  const [continuousListening, setContinuousListening] = useState(voiceSettings?.continuousListening || false);
+  const [voiceResponse, setVoiceResponse] = useState<boolean>(voiceSettings?.voiceResponse ?? true);
+  const [continuousListening, setContinuousListening] = useState<boolean>(voiceSettings?.continuousListening ?? false);
   const [voiceLanguage, setVoiceLanguage] = useState(voiceSettings?.voiceLanguage || "en-US");
   
   // ERP connection state
@@ -216,7 +216,7 @@ const SettingsPage = () => {
               <Switch 
                 id="voice-response"
                 checked={voiceResponse} 
-                onCheckedChange={setVoiceResponse} 
+                onCheckedChange={(checked: boolean) => setVoiceResponse(checked)} 
               />
             </div>
             
@@ -231,7 +231,7 @@ const SettingsPage = () => {
               <Switch 
                 id="continuous-listening"
                 checked={continuousListening} 
-                onCheckedChange={setContinuousListening} 
+                onCheckedChange={(checked: boolean) => setContinuousListening(checked)} 
               />
             </div>
           </CardContent>
