@@ -221,7 +221,7 @@ const SimpleControls = () => {
       const command = inputText.toLowerCase();
       if (command.includes('inventory') || command.includes('check') || 
           command.includes('order') || command.includes('invoice') || command.includes('user list') ||
-          command.includes('contact') || command.includes('contacts')) {
+          command.includes('contact') || command.includes('contacts') || command.includes('supplier')) {
         
         // Get the connection information
         const connectionResponse = await axios.get('/api/connection/1');
@@ -369,6 +369,40 @@ const SimpleControls = () => {
             } catch (error) {
               console.error("Error processing contact list command:", error);
               setResult(`Error retrieving contact list: ${(error as Error).message}`);
+            }
+          }
+          // Handle supplier list command
+          else if (command.includes('supplier')) {
+            try {
+              console.log("Processing supplier list command");
+              const suppliersResponse = await axios.post('/api/erp/query', {
+                userId: connection.userId,
+                connectionId: connection.id,
+                method: 'get_list',
+                doctype: 'Supplier',
+                filters: [],
+                fields: ['name', 'supplier_name', 'supplier_group', 'country', 'supplier_type']
+              });
+              
+              console.log("Supplier list response:", suppliersResponse.data);
+              
+              if (suppliersResponse.data.success && suppliersResponse.data.data) {
+                const suppliers = suppliersResponse.data.data;
+                if (suppliers.length > 0) {
+                  const supplierList = suppliers.map((supplier: any) => 
+                    `${supplier.supplier_name || supplier.name} (${supplier.supplier_group || 'No group'})`
+                  ).join(', ');
+                  
+                  setResult(`Found ${suppliers.length} suppliers: ${supplierList}`);
+                } else {
+                  setResult("No suppliers found.");
+                }
+              } else {
+                setResult(`Error retrieving supplier list: ${suppliersResponse.data.message || 'Unknown error'}`);
+              }
+            } catch (error) {
+              console.error("Error processing supplier list command:", error);
+              setResult(`Error retrieving supplier list: ${(error as Error).message}`);
             }
           }
           // Default response
@@ -533,6 +567,15 @@ const SimpleControls = () => {
               }}
             >
               contact list
+            </span>
+            <span 
+              className="inline-block px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium cursor-pointer hover:bg-blue-100"
+              onClick={() => {
+                setInputText("show supplier list");
+                processCommand();
+              }}
+            >
+              supplier list
             </span>
           </div>
         </div>
