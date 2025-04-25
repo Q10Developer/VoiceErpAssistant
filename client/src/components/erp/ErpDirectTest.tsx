@@ -33,7 +33,7 @@ const ErpDirectTest = () => {
               command: 'Load Connection', 
               success: false, 
               data: null, 
-              message: 'Failed to load ERPNext connection. Please go to Settings and configure your connection.'
+              message: 'Failed to load QBS connection. Please go to Settings and configure your connection.'
             },
             ...prev
           ]);
@@ -259,7 +259,7 @@ const ErpDirectTest = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Database className="h-5 w-5" />
-          ERPNext Direct API Test
+          QBS Direct API Test
         </CardTitle>
       </CardHeader>
       <CardContent>

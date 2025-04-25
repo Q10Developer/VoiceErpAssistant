@@ -13,12 +13,12 @@ const ErpTestPage: React.FC = () => {
         </Link>
       </div>
       
-      <h1 className="text-3xl font-bold mb-8 text-center">ERPNext Connection Test</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center">QBS Connection Test</h1>
       
       <div className="mb-6">
         <p className="text-center text-gray-600 max-w-2xl mx-auto">
-          Use this tool to test and update your ERPNext connection.
-          Make sure you have the correct URL, API Key, and API Secret for your ERPNext instance.
+          Use this tool to test and update your QBS connection.
+          Make sure you have the correct URL, API Key, and API Secret for your QBS instance.
         </p>
       </div>
       

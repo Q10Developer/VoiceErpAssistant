@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Server, RefreshCw } from "lucide-react";
 import axios from "axios";
 
-// A standalone tool to test ERPNext connection
+// A standalone tool to test QBS connection
 const ErpTestTool = () => {
   const [url, setUrl] = useState("https://qbs.q10analytics.com");
   const [apiKey, setApiKey] = useState("");
@@ -20,7 +20,7 @@ const ErpTestTool = () => {
     setError(null);
 
     try {
-      console.log("Testing ERPNext connection with:", { 
+      console.log("Testing QBS connection with:", { 
         url, 
         apiKey: apiKey ? "provided" : "missing", 
         apiSecret: apiSecret ? "provided" : "missing" 
@@ -32,7 +32,7 @@ const ErpTestTool = () => {
         apiSecret,
       });
 
-      console.log("ERPNext test response:", response.data);
+      console.log("QBS test response:", response.data);
       setTestResult(response.data);
     } catch (err: any) {
       console.error("Error testing connection:", err);
@@ -69,24 +69,24 @@ const ErpTestTool = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Server className="h-6 w-6" />
-          ERPNext Connection Tester
+          QBS Connection Tester
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div className="grid gap-2">
             <label htmlFor="url" className="text-sm font-medium">
-              ERPNext URL
+              QBS URL
             </label>
             <Input
               id="url"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://your-erpnext-instance.com"
+              placeholder="https://your-qbs-instance.com"
               className="w-full"
             />
             <p className="text-xs text-gray-500">
-              Enter the base URL of your ERPNext instance without /app or trailing slashes
+              Enter the base URL of your QBS instance without /app or trailing slashes
             </p>
           </div>
 
@@ -159,7 +159,7 @@ const ErpTestTool = () => {
             <ul className="text-sm list-disc pl-5 space-y-1">
               <li>The URL should be the base URL without "/app" at the end</li>
               <li>Make sure both API Key and API Secret are complete and correct</li>
-              <li>Check that your ERPNext instance has API access enabled</li>
+              <li>Check that your QBS instance has API access enabled</li>
               <li>Verify that the user associated with the API key has sufficient permissions</li>
             </ul>
           </div>
