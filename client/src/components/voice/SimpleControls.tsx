@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Mic, Square, Check, Server } from "lucide-react";
+import { Mic, Square, Check, Server, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import axios from "axios";
@@ -11,14 +11,24 @@ const SimpleControls = () => {
   const [result, setResult] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [transcript, setTranscript] = useState("");
+  const [isSpeechEnabled, setIsSpeechEnabled] = useState(true);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   
-  // Speech recognition
+  // Speech recognition and synthesis
   const recognitionRef = useRef<any>(null);
+  const speechSynthesisRef = useRef<SpeechSynthesis | null>(null);
   
-  // Initialize speech recognition
+  // Initialize speech recognition and synthesis
   useEffect(() => {
     // Browser compatibility check for SpeechRecognition
     const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
+    
+    // Initialize speech synthesis
+    if (window.speechSynthesis) {
+      speechSynthesisRef.current = window.speechSynthesis;
+    } else {
+      console.error('Speech synthesis not supported in this browser');
+    }
     
     if (SpeechRecognition) {
       recognitionRef.current = new SpeechRecognition();
@@ -197,10 +207,11 @@ const SimpleControls = () => {
         status: "pending"
       });
       
-      // First, check if it's an ERP command
+      // First, check if it's a QBS command
       const command = inputText.toLowerCase();
       if (command.includes('inventory') || command.includes('check') || 
-          command.includes('order') || command.includes('invoice') || command.includes('user list')) {
+          command.includes('order') || command.includes('invoice') || command.includes('user list') ||
+          command.includes('contact') || command.includes('contacts')) {
         
         // Get the connection information
         const connectionResponse = await axios.get('/api/connection/1');
@@ -315,12 +326,47 @@ const SimpleControls = () => {
               setResult(`Error retrieving user list: ${(error as Error).message}`);
             }
           }
+          // Handle contact list command
+          else if (command.includes('contact') || command.includes('contacts')) {
+            try {
+              console.log("Processing contact list command");
+              const contactsResponse = await axios.post('/api/erp/query', {
+                userId: connection.userId,
+                connectionId: connection.id,
+                method: 'get_list',
+                doctype: 'Contact',
+                filters: [],
+                fields: ['name', 'first_name', 'last_name', 'email_id', 'phone', 'mobile_no', 'is_primary_contact']
+              });
+              
+              console.log("Contact list response:", contactsResponse.data);
+              
+              if (contactsResponse.data.success && contactsResponse.data.data) {
+                const contacts = contactsResponse.data.data;
+                if (contacts.length > 0) {
+                  const contactList = contacts.map((contact: any) => {
+                    const fullName = [contact.first_name, contact.last_name].filter(Boolean).join(' ');
+                    return `${fullName || contact.name} (${contact.phone || contact.mobile_no || 'No phone'})`;
+                  }).join(', ');
+                  
+                  setResult(`Found ${contacts.length} contacts: ${contactList}`);
+                } else {
+                  setResult("No contacts found.");
+                }
+              } else {
+                setResult(`Error retrieving contact list: ${contactsResponse.data.message || 'Unknown error'}`);
+              }
+            } catch (error) {
+              console.error("Error processing contact list command:", error);
+              setResult(`Error retrieving contact list: ${(error as Error).message}`);
+            }
+          }
           // Default response
           else {
-            setResult(`Processing ERP command: "${inputText}"`);
+            setResult(`Processing QBS command: "${inputText}"`);
           }
         } else {
-          setResult("No valid ERPNext connection found. Please configure your connection in settings.");
+          setResult("No valid QBS connection found. Please configure your connection in settings.");
         }
       } 
       // Non-ERP command
@@ -355,7 +401,7 @@ const SimpleControls = () => {
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden border">
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-4 border-b">
-        <h2 className="font-semibold text-xl text-center text-white">ERPNext Voice Assistant</h2>
+        <h2 className="font-semibold text-xl text-center text-white">QBS Voice Assistant</h2>
         
         <div className="flex items-center justify-center mt-2">
           <span className={`inline-block w-4 h-4 rounded-full mr-2 ${
@@ -387,14 +433,41 @@ const SimpleControls = () => {
         <div className="mb-5">
           <h3 className="text-sm font-medium text-gray-500 mb-2">Try these commands:</h3>
           <div className="flex flex-wrap gap-2">
-            <span className="inline-block px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
+            <span 
+              className="inline-block px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium cursor-pointer hover:bg-blue-100"
+              onClick={() => {
+                setInputText("user list");
+                processCommand();
+              }}
+            >
               user list
             </span>
-            <span className="inline-block px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
+            <span 
+              className="inline-block px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium cursor-pointer hover:bg-blue-100"
+              onClick={() => {
+                setInputText("check inventory for Plate");
+                processCommand();
+              }}
+            >
               check inventory for Plate
             </span>
-            <span className="inline-block px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
+            <span 
+              className="inline-block px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium cursor-pointer hover:bg-blue-100"
+              onClick={() => {
+                setInputText("show orders");
+                processCommand();
+              }}
+            >
               show orders
+            </span>
+            <span 
+              className="inline-block px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium cursor-pointer hover:bg-blue-100"
+              onClick={() => {
+                setInputText("show contact list");
+                processCommand();
+              }}
+            >
+              contact list
             </span>
           </div>
         </div>
