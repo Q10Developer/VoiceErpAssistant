@@ -5,6 +5,7 @@ import VoiceSettings from "@/components/voice/VoiceSettings";
 import HelpPanel from "@/components/voice/HelpPanel";
 import BasicControls from "@/components/voice/BasicControls";
 import SimpleControls from "@/components/voice/SimpleControls";
+import ErpDirectTest from "@/components/erp/ErpDirectTest";
 import { Link } from "wouter";
 import { AlertTriangle, Server } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -60,6 +61,11 @@ const Dashboard = () => {
           </p>
         </div>
         <CommandHistory />
+      </div>
+      
+      {/* ERPNext Direct API Test */}
+      <div className="mt-6">
+        <ErpDirectTest />
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
