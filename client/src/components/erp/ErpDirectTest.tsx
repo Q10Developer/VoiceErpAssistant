@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Database, Package, ClipboardList, Plus } from "lucide-react";
+import { Database, Package, ClipboardList, Plus, MessageSquare } from "lucide-react";
 import { erpNextApi } from '@/lib/erpNextApi';
+import { handleVoiceCommand } from '@/lib/erpCommands';
 
 // Interface for the test result
 interface TestResult {
@@ -146,6 +147,89 @@ const ErpDirectTest = () => {
       setLoading(false);
     }
   };
+  
+  const testUserList = async () => {
+    if (!connection) return;
+    
+    setLoading(true);
+    try {
+      // Make direct API call to fetch user list
+      const response = await fetch('/api/erp/query', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId: connection.userId,
+          connectionId: connection.id,
+          method: 'get_list',
+          doctype: 'User',
+          filters: [],
+          fields: ['name', 'full_name', 'email', 'enabled']
+        })
+      });
+      
+      const result = await response.json();
+      
+      setResults(prev => [
+        { 
+          command: 'Get User List', 
+          success: result.success, 
+          data: result.data, 
+          message: result.message
+        },
+        ...prev
+      ]);
+    } catch (error) {
+      setResults(prev => [
+        { 
+          command: 'Get User List', 
+          success: false, 
+          data: null, 
+          message: 'Test failed with error',
+          error
+        },
+        ...prev
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Test direct voice command processing
+  const testVoiceCommand = async () => {
+    if (!connection) return;
+    
+    setLoading(true);
+    try {
+      // Test processing a voice command directly
+      const command = "check inventory for product Plate";
+      const result = await handleVoiceCommand(command, connection);
+      
+      setResults(prev => [
+        { 
+          command: `Voice Command: "${command}"`, 
+          success: true, 
+          data: { response: result }, 
+          message: result
+        },
+        ...prev
+      ]);
+    } catch (error) {
+      setResults(prev => [
+        { 
+          command: 'Voice Command Test', 
+          success: false, 
+          data: null, 
+          message: 'Test failed with error',
+          error
+        },
+        ...prev
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Card className="w-full">
@@ -167,6 +251,16 @@ const ErpDirectTest = () => {
         )}
 
         <div className="flex flex-wrap gap-2 mb-4">
+          <Button 
+            onClick={testUserList} 
+            disabled={loading || !connection}
+            className="flex items-center"
+            variant="outline"
+          >
+            <Database className="mr-2 h-4 w-4" />
+            Test User List API
+          </Button>
+          
           <Button 
             onClick={testInventory} 
             disabled={loading || !connection}
@@ -195,6 +289,16 @@ const ErpDirectTest = () => {
           >
             <Plus className="mr-2 h-4 w-4" />
             Test Create Invoice API
+          </Button>
+          
+          <Button 
+            onClick={testVoiceCommand} 
+            disabled={loading || !connection}
+            className="flex items-center"
+            variant="default"
+          >
+            <MessageSquare className="mr-2 h-4 w-4" />
+            Test Voice Command Handler
           </Button>
         </div>
 
