@@ -140,8 +140,12 @@ export const VoiceProvider = ({ children }: { children: ReactNode }) => {
     }
   });
 
-  // Speech synthesis
-  const { speak } = useSpeechSynthesis();
+  // Speech synthesis with softer, more natural voice settings
+  const { speak } = useSpeechSynthesis({
+    pitch: 0.9,  // Slightly lower pitch for a softer voice
+    rate: 0.95,  // Slightly slower rate for more natural speech
+    volume: 0.85 // Slightly lower volume for a gentler tone
+  });
 
   // Start listening
   const startListening = () => {
@@ -196,7 +200,13 @@ export const VoiceProvider = ({ children }: { children: ReactNode }) => {
       
       // Speak the result if voice response is enabled
       if (voiceSettings?.voiceResponse) {
-        speak(result);
+        // Format the text to make it sound more conversational
+        const conversationalResult = result
+          .replace(/\b([A-Z])\b/g, '$1.') // Add periods after single capital letters so they're not overpronounced
+          .replace(/([0-9]+)/g, ' $1 ') // Add spaces around numbers for better pronunciation
+          .replace(/\s{2,}/g, ' '); // Remove any double spaces
+        
+        speak(conversationalResult);
       }
       
       // Update command in history with result
@@ -222,7 +232,13 @@ export const VoiceProvider = ({ children }: { children: ReactNode }) => {
       
       // Speak the error if voice response is enabled
       if (voiceSettings?.voiceResponse) {
-        speak(`Error: ${errorMessage}`);
+        // Format the error message to sound more conversational
+        const conversationalError = `I'm sorry, there was a problem. ${errorMessage}`
+          .replace(/\b([A-Z])\b/g, '$1.') // Add periods after single capital letters
+          .replace(/([0-9]+)/g, ' $1 ') // Add spaces around numbers
+          .replace(/\s{2,}/g, ' '); // Remove any double spaces
+        
+        speak(conversationalError);
       }
       
       // Add error to command history
