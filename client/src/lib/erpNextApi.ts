@@ -17,7 +17,7 @@ interface ErpResponse<T> {
   data: T;
 }
 
-// We no longer use mock data - all requests will go to the actual ERPNext instance
+// We no longer use mock data - all requests will go to the actual QBS instance
 
 // ERP API service
 export const erpNextApi = {
@@ -36,7 +36,7 @@ export const erpNextApi = {
       });
       
       const itemData = await itemResponse.json();
-      console.log("ERPNext item search response:", itemData);
+      console.log("QBS item search response:", itemData);
       
       if (!itemData.data || !Array.isArray(itemData.data) || itemData.data.length === 0) {
         return {
@@ -62,7 +62,7 @@ export const erpNextApi = {
       });
       
       const binData = await binResponse.json();
-      console.log("ERPNext bin data response:", binData);
+      console.log("QBS bin data response:", binData);
       
       // Combine item and bin data
       const result = binData.data && binData.data.length > 0 ? 
@@ -84,7 +84,7 @@ export const erpNextApi = {
         data: result
       };
     } catch (error) {
-      console.error("ERPNext inventory error:", error);
+      console.error("QBS inventory error:", error);
       return {
         success: false,
         message: (error as Error).message,
@@ -108,7 +108,7 @@ export const erpNextApi = {
       });
       
       const customerData = await customerResponse.json();
-      console.log("ERPNext customer search response:", customerData);
+      console.log("QBS customer search response:", customerData);
       
       if (!customerData.data || !Array.isArray(customerData.data) || customerData.data.length === 0) {
         return {
@@ -164,7 +164,7 @@ export const erpNextApi = {
       });
       
       const data = await response.json();
-      console.log("ERPNext create invoice response:", data);
+      console.log("QBS create invoice response:", data);
       
       if (!data.success) {
         return {
@@ -204,7 +204,7 @@ export const erpNextApi = {
       });
       
       const data = await response.json();
-      console.log("ERPNext open orders response:", data);
+      console.log("QBS open orders response:", data);
       
       if (!data.data || !Array.isArray(data.data)) {
         return {
@@ -238,10 +238,10 @@ export const erpNextApi = {
     }
   },
   
-  // Test connection to ERPNext
+  // Test connection to QBS
   async testConnection(url: string, apiKey: string, apiSecret: string): Promise<ErpResponse<any>> {
     try {
-      // In a real implementation, this would test connection to ERPNext API
+      // In a real implementation, this would test connection to QBS API
       // For demonstration purposes, we will simulate success if all parameters are provided
       
       // Call our backend proxy to test the connection
