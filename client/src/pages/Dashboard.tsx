@@ -3,16 +3,16 @@ import CommandHistory from "@/components/voice/CommandHistory";
 import QuickCommands from "@/components/voice/QuickCommands";
 import VoiceSettings from "@/components/voice/VoiceSettings";
 import HelpPanel from "@/components/voice/HelpPanel";
-import VoiceControls from "@/components/voice/VoiceControls";
+import BasicControls from "@/components/voice/BasicControls";
 
 const Dashboard = () => {
   return (
     <>
       <h1 className="text-2xl font-medium text-neutral-800 mb-6">Voice Assistant Dashboard</h1>
       
-      {/* Voice Controls Panel */}
+      {/* Basic Controls Panel */}
       <div className="mb-6">
-        <VoiceControls />
+        <BasicControls />
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
