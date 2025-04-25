@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Mic, Square, Check, Server } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,15 +10,107 @@ const SimpleControls = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [result, setResult] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [transcript, setTranscript] = useState("");
   
-  // Simple recording simulation - no real speech recognition
+  // Speech recognition
+  const recognitionRef = useRef<any>(null);
+  
+  // Initialize speech recognition
+  useEffect(() => {
+    // Browser compatibility check for SpeechRecognition
+    const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
+    
+    if (SpeechRecognition) {
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
+      recognitionRef.current.lang = 'en-US';
+      
+      recognitionRef.current.onresult = (event: any) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+        
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript;
+            console.log("Final transcript:", transcript);
+          } else {
+            interimTranscript += transcript;
+            console.log("Interim transcript:", transcript);
+          }
+        }
+        
+        // Update input field with transcript
+        if (finalTranscript) {
+          console.log("Setting input text to final transcript:", finalTranscript);
+          setInputText(finalTranscript);
+          setTranscript(finalTranscript);
+        } else if (interimTranscript) {
+          console.log("Setting transcript to interim:", interimTranscript);
+          setTranscript(interimTranscript);
+          // Also update the input field in real-time so users see what's being recognized
+          setInputText(interimTranscript);
+        }
+      };
+      
+      recognitionRef.current.onerror = (event: any) => {
+        console.error('Speech recognition error', event.error);
+        setIsRecording(false);
+      };
+      
+      recognitionRef.current.onend = () => {
+        console.log('Speech recognition ended');
+        setIsRecording(false);
+      };
+    } else {
+      console.error('Speech recognition not supported in this browser');
+    }
+    
+    // Cleanup
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, []);
+  
+  // Start speech recognition
   const startRecording = () => {
-    setIsRecording(true);
-    setResult("");
+    try {
+      if (recognitionRef.current) {
+        recognitionRef.current.start();
+        setIsRecording(true);
+        setResult("");
+      } else {
+        setResult("Speech recognition is not supported in your browser");
+      }
+    } catch (error) {
+      console.error('Error starting speech recognition:', error);
+      setResult(`Error: ${(error as Error).message}`);
+    }
   };
   
+  // Stop speech recognition
   const stopRecording = () => {
-    setIsRecording(false);
+    try {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+        setIsRecording(false);
+        
+        // Process the command if we have a transcript
+        if (transcript) {
+          setInputText(transcript);
+          setTimeout(() => {
+            processCommand();
+          }, 500);
+        }
+      }
+    } catch (error) {
+      console.error('Error stopping speech recognition:', error);
+      setIsRecording(false);
+    }
   };
   
   // Simple direct API call without using contexts
@@ -246,6 +338,14 @@ const SimpleControls = () => {
               }}
             />
           </div>
+          
+          {/* Speech recognition feedback */}
+          {isRecording && (
+            <div className="mt-2 px-3 py-2 bg-blue-50 rounded-lg border border-blue-100 text-sm">
+              <p className="font-medium text-blue-700 mb-1">Listening...</p>
+              <p className="text-blue-600 italic">{transcript ? `"${transcript}"` : "Say something..."}</p>
+            </div>
+          )}
         </div>
         
         {/* Voice control buttons */}
