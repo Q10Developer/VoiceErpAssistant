@@ -165,6 +165,7 @@ async function handleShowOpenOrders(erpConnection: ErpConnection | null): Promis
 
 // Main command handler
 export async function handleVoiceCommand(command: string, erpConnection: ErpConnection | null): Promise<string> {
+  logDebug("Processing voice command", { command, connection: !!erpConnection });
   const normalizedCommand = command.toLowerCase();
   
   // Check if connected
@@ -174,19 +175,22 @@ export async function handleVoiceCommand(command: string, erpConnection: ErpConn
   
   // Command: Check inventory
   if (normalizedCommand.includes("check inventory") || normalizedCommand.includes("inventory check") || 
-      normalizedCommand.includes("stock level") || normalizedCommand.includes("how many") && normalizedCommand.includes("stock")) {
+      normalizedCommand.includes("stock level") || (normalizedCommand.includes("how many") && normalizedCommand.includes("stock"))) {
+    logDebug("Handling as inventory check command");
     return await handleInventoryCheck(command, erpConnection);
   }
   
   // Command: Create invoice
   if (normalizedCommand.includes("create invoice") || normalizedCommand.includes("make invoice") || 
       normalizedCommand.includes("new invoice") || normalizedCommand.includes("generate invoice")) {
+    logDebug("Handling as create invoice command");
     return await handleCreateInvoice(command, erpConnection);
   }
   
   // Command: Show open orders
   if (normalizedCommand.includes("open orders") || normalizedCommand.includes("show orders") || 
       normalizedCommand.includes("pending orders") || normalizedCommand.includes("list orders")) {
+    logDebug("Handling as show open orders command");
     return await handleShowOpenOrders(erpConnection);
   }
   

@@ -318,14 +318,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
             
             // Use method API endpoint pattern since it's working
-            response = await axios.get(`${url}/api/method/frappe.client.get_list`, {
-              params: {
-                doctype: doctype,
-                filters: filters ? JSON.stringify(filters) : undefined,
-                fields: fields ? JSON.stringify(fields) : undefined
-              },
+            // Adding more debug logging to see what's happening
+            console.log("Querying ERPNext API with params:", {
+              doctype,
+              filters: filters ? JSON.stringify(filters) : undefined,
+              fields: fields ? JSON.stringify(fields) : undefined
+            });
+            
+            // Try using POST instead of GET for more consistent parameter handling
+            response = await axios.post(`${url}/api/method/frappe.client.get_list`, {
+              doctype: doctype,
+              filters: filters || [],
+              fields: fields || ["name"]
+            }, {
               headers: {
-                'Authorization': `token ${apiKey}:${apiSecret}`
+                'Authorization': `token ${apiKey}:${apiSecret}`,
+                'Content-Type': 'application/json'
               }
             });
             break;
@@ -334,7 +342,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
             return res.status(400).json({ message: "Invalid method" });
         }
         
-        res.json(response.data);
+        // Log the response data for debugging
+        console.log("ERPNext API response:", response.data);
+        
+        // Properly format the response
+        // ERPNext method API usually returns data in the "message" field
+        res.json({
+          success: true,
+          message: "Query successful",
+          data: response.data.message || response.data
+        });
       } catch (error) {
         if (axios.isAxiosError(error)) {
           return res.status(error.response?.status || 500).json({ 
@@ -374,17 +391,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       try {
         // Use method API endpoint pattern since it's working
-        const response = await axios.post(`${url}/api/method/frappe.client.insert`, {
-          doc: {
-            doctype: doctype,
-            ...doc
-          }
-        }, {
-          headers: {
-            'Authorization': `token ${apiKey}:${apiSecret}`,
-            'Content-Type': 'application/json'
-          }
+        // Add debug logging
+        console.log("Creating document in ERPNext:", {
+          doctype,
+          doc
         });
+        
+        // We need to send the document directly, not nested under "doc"
+        const documentToCreate = {
+          doctype: doctype,
+          ...doc
+        };
+        
+        const response = await axios.post(`${url}/api/method/frappe.client.insert`, 
+          documentToCreate, 
+          {
+            headers: {
+              'Authorization': `token ${apiKey}:${apiSecret}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
         
         res.json({
           success: true,
