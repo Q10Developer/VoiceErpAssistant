@@ -20,12 +20,19 @@ const ErpTestTool = () => {
     setError(null);
 
     try {
+      console.log("Testing ERPNext connection with:", { 
+        url, 
+        apiKey: apiKey ? "provided" : "missing", 
+        apiSecret: apiSecret ? "provided" : "missing" 
+      });
+      
       const response = await axios.post("/api/connection/test", {
         url,
         apiKey,
         apiSecret,
       });
 
+      console.log("ERPNext test response:", response.data);
       setTestResult(response.data);
     } catch (err: any) {
       console.error("Error testing connection:", err);

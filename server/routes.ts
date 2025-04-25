@@ -397,10 +397,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           doc
         });
         
-        // We need to send the document directly, not nested under "doc"
+        // For frappe.client.insert, we need to nest the document under "doc" property
         const documentToCreate = {
-          doctype: doctype,
-          ...doc
+          doc: {
+            doctype: doctype,
+            ...doc
+          }
         };
         
         const response = await axios.post(`${url}/api/method/frappe.client.insert`, 
@@ -413,10 +415,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         );
         
+        console.log("ERPNext insert response:", response.data);
+        
         res.json({
           success: true,
           message: `${doctype} created successfully`,
-          doc: response.data.data
+          doc: response.data.message || response.data.data || response.data
         });
       } catch (error) {
         if (axios.isAxiosError(error)) {
