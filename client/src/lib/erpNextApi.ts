@@ -35,12 +35,22 @@ export const erpNextApi = {
       });
       
       const data = await response.json();
+      console.log("ERPNext inventory response:", data);
+      
+      // Handle the new response format with message property
+      if (data.message) {
+        return {
+          success: true,
+          data: Array.isArray(data.message) ? data.message : [data.message]
+        };
+      }
       
       return {
         success: true,
         data: data.items || []
       };
     } catch (error) {
+      console.error("ERPNext inventory error:", error);
       return {
         success: false,
         message: (error as Error).message,
@@ -70,6 +80,16 @@ export const erpNextApi = {
       });
       
       const data = await response.json();
+      console.log("ERPNext create invoice response:", data);
+      
+      // Handle the new response format with message property
+      if (data.message) {
+        return {
+          success: true,
+          message: typeof data.message === 'string' ? data.message : 'Invoice created successfully',
+          data: typeof data.message === 'object' ? data.message : (data.doc || {})
+        };
+      }
       
       return {
         success: data.success || false,
@@ -77,6 +97,7 @@ export const erpNextApi = {
         data: data.doc || {}
       };
     } catch (error) {
+      console.error("ERPNext create invoice error:", error);
       return {
         success: false,
         message: (error as Error).message,
@@ -99,12 +120,22 @@ export const erpNextApi = {
       });
       
       const data = await response.json();
+      console.log("ERPNext open orders response:", data);
+      
+      // Handle the new response format with message property
+      if (data.message) {
+        return {
+          success: true,
+          data: Array.isArray(data.message) ? data.message : [data.message]
+        };
+      }
       
       return {
         success: true,
         data: data.items || []
       };
     } catch (error) {
+      console.error("ERPNext open orders error:", error);
       return {
         success: false,
         message: (error as Error).message,

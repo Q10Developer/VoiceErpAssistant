@@ -1,9 +1,23 @@
 import { queryClient } from "./queryClient";
 import { erpNextApi } from "./erpNextApi";
 
+// For debugging purposes
+const DEBUG = true;
+
+function logDebug(message: string, data?: any) {
+  if (DEBUG) {
+    console.log(`[ERPCommand] ${message}`, data || '');
+  }
+}
+
 interface ErpConnection {
+  id?: number;
+  userId: number;
   url: string;
   apiKey: string;
+  apiSecret: string;
+  isActive: boolean;
+  lastConnected?: Date;
 }
 
 // Helper function to extract number from string
@@ -52,18 +66,23 @@ function extractCustomerName(text: string): string | null {
 
 // Handle check inventory command
 async function handleInventoryCheck(command: string, erpConnection: ErpConnection | null): Promise<string> {
+  logDebug("Handling inventory check command", { command, erpConnection });
+  
   if (!erpConnection) {
     return "You need to connect to ERPNext first. Please go to Settings and set up your connection.";
   }
   
   const productName = extractProductName(command);
+  logDebug("Extracted product name", productName);
   
   if (!productName) {
     return "Please specify a product name for inventory check. For example, 'Check inventory for product XYZ'.";
   }
   
   try {
+    logDebug("Calling ERPNext API for inventory", { productName });
     const response = await erpNextApi.getInventory(erpConnection, productName);
+    logDebug("ERPNext inventory response", response);
     
     if (response.success) {
       if (response.data.length === 0) {
@@ -72,48 +91,60 @@ async function handleInventoryCheck(command: string, erpConnection: ErpConnectio
       
       // Format inventory information
       const item = response.data[0];
+      logDebug("Item data from inventory", item);
       return `Product ${item.item_name || productName} has ${item.actual_qty || 0} units in stock.`;
     } else {
       return `Error checking inventory: ${response.message}`;
     }
   } catch (error) {
+    logDebug("Error in inventory check", error);
     return `Error checking inventory: ${(error as Error).message}`;
   }
 }
 
 // Handle create invoice command
 async function handleCreateInvoice(command: string, erpConnection: ErpConnection | null): Promise<string> {
+  logDebug("Handling create invoice command", { command, erpConnection });
+  
   if (!erpConnection) {
     return "You need to connect to ERPNext first. Please go to Settings and set up your connection.";
   }
   
   const customerName = extractCustomerName(command);
+  logDebug("Extracted customer name", customerName);
   
   if (!customerName) {
     return "Please specify a customer name for the invoice. For example, 'Create invoice for customer ABC'.";
   }
   
   try {
+    logDebug("Calling ERPNext API to create invoice", { customerName });
     const response = await erpNextApi.createInvoice(erpConnection, customerName);
+    logDebug("ERPNext create invoice response", response);
     
     if (response.success) {
-      return `Sales invoice ${response.data.name} created for customer ${customerName}.`;
+      return `Sales invoice ${response.data.name || 'created'} for customer ${customerName}.`;
     } else {
       return `Error creating invoice: ${response.message}`;
     }
   } catch (error) {
+    logDebug("Error in create invoice", error);
     return `Error creating invoice: ${(error as Error).message}`;
   }
 }
 
 // Handle show open orders command
 async function handleShowOpenOrders(erpConnection: ErpConnection | null): Promise<string> {
+  logDebug("Handling show open orders command", { erpConnection });
+  
   if (!erpConnection) {
     return "You need to connect to ERPNext first. Please go to Settings and set up your connection.";
   }
   
   try {
+    logDebug("Calling ERPNext API for open orders");
     const response = await erpNextApi.getOpenOrders(erpConnection);
+    logDebug("ERPNext open orders response", response);
     
     if (response.success) {
       if (response.data.length === 0) {
@@ -121,11 +152,13 @@ async function handleShowOpenOrders(erpConnection: ErpConnection | null): Promis
       }
       
       // Format open orders information
-      return `Found ${response.data.length} open orders. ${response.data.length > 0 ? `The most recent is ${response.data[0].name} for customer ${response.data[0].customer}.` : ''}`;
+      logDebug("Open orders data", response.data);
+      return `Found ${response.data.length} open orders. ${response.data.length > 0 ? `The most recent is ${response.data[0].name || 'unknown'} for customer ${response.data[0].customer || 'unknown'}.` : ''}`;
     } else {
       return `Error fetching open orders: ${response.message}`;
     }
   } catch (error) {
+    logDebug("Error in show open orders", error);
     return `Error fetching open orders: ${(error as Error).message}`;
   }
 }
