@@ -15,6 +15,8 @@ import {
   type ErpConnection,
   type InsertErpConnection
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, desc } from "drizzle-orm";
 
 // Storage interface for all CRUD operations
 export interface IStorage {
@@ -240,4 +242,192 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Database storage implementation
+export class DatabaseStorage implements IStorage {
+  // User operations
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+  
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
+  }
+  
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db.insert(users).values(insertUser).returning();
+    return user;
+  }
+  
+  // Command history operations
+  async getCommandHistory(userId: number, limit?: number): Promise<CommandHistory[]> {
+    let query = db.select()
+      .from(commandHistory)
+      .where(eq(commandHistory.userId, userId))
+      .orderBy(desc(commandHistory.timestamp));
+    
+    if (limit) {
+      query = query.limit(limit);
+    }
+    
+    return await query;
+  }
+  
+  async createCommandHistory(command: InsertCommandHistory): Promise<CommandHistory> {
+    const [newCommand] = await db.insert(commandHistory)
+      .values(command)
+      .returning();
+    return newCommand;
+  }
+  
+  // Voice settings operations
+  async getVoiceSettings(userId: number): Promise<VoiceSettings | undefined> {
+    const [settings] = await db.select()
+      .from(voiceSettings)
+      .where(eq(voiceSettings.userId, userId));
+    return settings;
+  }
+  
+  async createVoiceSettings(settings: InsertVoiceSettings): Promise<VoiceSettings> {
+    const [newSettings] = await db.insert(voiceSettings)
+      .values(settings)
+      .returning();
+    return newSettings;
+  }
+  
+  async updateVoiceSettings(userId: number, settings: Partial<InsertVoiceSettings>): Promise<VoiceSettings | undefined> {
+    const [existingSettings] = await db.select()
+      .from(voiceSettings)
+      .where(eq(voiceSettings.userId, userId));
+    
+    if (!existingSettings) {
+      return undefined;
+    }
+    
+    const [updatedSettings] = await db.update(voiceSettings)
+      .set(settings)
+      .where(eq(voiceSettings.userId, userId))
+      .returning();
+    
+    return updatedSettings;
+  }
+  
+  // Quick commands operations
+  async getQuickCommands(userId: number): Promise<QuickCommand[]> {
+    return await db.select()
+      .from(quickCommands)
+      .where(eq(quickCommands.userId, userId))
+      .orderBy(quickCommands.sortOrder);
+  }
+  
+  async createQuickCommand(command: InsertQuickCommand): Promise<QuickCommand> {
+    const [newCommand] = await db.insert(quickCommands)
+      .values(command)
+      .returning();
+    return newCommand;
+  }
+  
+  async updateQuickCommand(id: number, command: Partial<InsertQuickCommand>): Promise<QuickCommand | undefined> {
+    const [updatedCommand] = await db.update(quickCommands)
+      .set(command)
+      .where(eq(quickCommands.id, id))
+      .returning();
+    
+    return updatedCommand;
+  }
+  
+  async deleteQuickCommand(id: number): Promise<boolean> {
+    const result = await db.delete(quickCommands)
+      .where(eq(quickCommands.id, id));
+    
+    return result.rowCount > 0;
+  }
+  
+  // ERP connection operations
+  async getErpConnection(userId: number): Promise<ErpConnection | undefined> {
+    const [connection] = await db.select()
+      .from(erpConnections)
+      .where(eq(erpConnections.userId, userId));
+    return connection;
+  }
+  
+  async createErpConnection(connection: InsertErpConnection): Promise<ErpConnection> {
+    const [newConnection] = await db.insert(erpConnections)
+      .values({
+        ...connection,
+        lastConnected: new Date()
+      })
+      .returning();
+    return newConnection;
+  }
+  
+  async updateErpConnection(userId: number, connection: Partial<InsertErpConnection>): Promise<ErpConnection | undefined> {
+    const [updatedConnection] = await db.update(erpConnections)
+      .set({
+        ...connection,
+        lastConnected: new Date()
+      })
+      .where(eq(erpConnections.userId, userId))
+      .returning();
+    
+    return updatedConnection;
+  }
+
+  // Initialize database with default data
+  async initialize(): Promise<void> {
+    // Check if we have a test user
+    const testUser = await this.getUserByUsername("admin");
+    
+    if (!testUser) {
+      // Create test user
+      const user = await this.createUser({
+        username: "admin",
+        password: "admin",
+        displayName: "John Doe",
+        role: "Administrator"
+      });
+      
+      // Create default voice settings
+      await this.createVoiceSettings({
+        userId: user.id,
+        wakeWord: "Hey ERP",
+        sensitivity: 7,
+        voiceResponse: true,
+        continuousListening: false,
+        voiceLanguage: "en-US"
+      });
+      
+      // Create default quick commands
+      await this.createQuickCommand({
+        userId: user.id,
+        commandText: "Check inventory status",
+        icon: "inventory",
+        sortOrder: 1
+      });
+      
+      await this.createQuickCommand({
+        userId: user.id,
+        commandText: "Create new invoice",
+        icon: "receipt",
+        sortOrder: 2
+      });
+      
+      await this.createQuickCommand({
+        userId: user.id,
+        commandText: "Show open orders",
+        icon: "shopping_cart",
+        sortOrder: 3
+      });
+      
+      await this.createQuickCommand({
+        userId: user.id,
+        commandText: "Sales summary for this month",
+        icon: "insights",
+        sortOrder: 4
+      });
+    }
+  }
+}
+
+export const storage = new DatabaseStorage();

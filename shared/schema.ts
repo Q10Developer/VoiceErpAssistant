@@ -1,4 +1,5 @@
 import { pgTable, text, serial, integer, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -10,6 +11,13 @@ export const users = pgTable("users", {
   displayName: text("display_name"),
   role: text("role").default("user"),
 });
+
+export const usersRelations = relations(users, ({ many }) => ({
+  commandHistory: many(commandHistory),
+  voiceSettings: many(voiceSettings),
+  quickCommands: many(quickCommands),
+  erpConnections: many(erpConnections),
+}));
 
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -28,6 +36,13 @@ export const commandHistory = pgTable("command_history", {
   timestamp: timestamp("timestamp").defaultNow(),
   metadata: jsonb("metadata"), // For any extra data like entities extracted
 });
+
+export const commandHistoryRelations = relations(commandHistory, ({ one }) => ({
+  user: one(users, {
+    fields: [commandHistory.userId],
+    references: [users.id],
+  }),
+}));
 
 export const insertCommandHistorySchema = createInsertSchema(commandHistory).pick({
   userId: true,
@@ -48,6 +63,13 @@ export const voiceSettings = pgTable("voice_settings", {
   voiceLanguage: text("voice_language").default("en-US"),
 });
 
+export const voiceSettingsRelations = relations(voiceSettings, ({ one }) => ({
+  user: one(users, {
+    fields: [voiceSettings.userId],
+    references: [users.id],
+  }),
+}));
+
 export const insertVoiceSettingsSchema = createInsertSchema(voiceSettings).pick({
   userId: true,
   wakeWord: true,
@@ -66,6 +88,13 @@ export const quickCommands = pgTable("quick_commands", {
   sortOrder: integer("sort_order").default(0),
 });
 
+export const quickCommandsRelations = relations(quickCommands, ({ one }) => ({
+  user: one(users, {
+    fields: [quickCommands.userId],
+    references: [users.id],
+  }),
+}));
+
 export const insertQuickCommandSchema = createInsertSchema(quickCommands).pick({
   userId: true,
   commandText: true,
@@ -83,6 +112,13 @@ export const erpConnections = pgTable("erp_connections", {
   isActive: boolean("is_active").default(true),
   lastConnected: timestamp("last_connected"),
 });
+
+export const erpConnectionsRelations = relations(erpConnections, ({ one }) => ({
+  user: one(users, {
+    fields: [erpConnections.userId],
+    references: [users.id],
+  }),
+}));
 
 export const insertErpConnectionSchema = createInsertSchema(erpConnections).pick({
   userId: true,
