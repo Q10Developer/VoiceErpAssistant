@@ -170,8 +170,26 @@ export const VoiceProvider = ({ children }: { children: ReactNode }) => {
         status: "pending"
       });
 
+      // Check connection and properly format it
+      console.log("Original ERP connection from context:", erpConnection);
+      
+      let formattedConnection = null;
+      if (erpConnection) {
+        formattedConnection = {
+          id: erpConnection.id,
+          userId: erpConnection.userId,
+          url: erpConnection.url,
+          apiKey: erpConnection.apiKey,
+          apiSecret: erpConnection.apiSecret,
+          isActive: erpConnection.isActive,
+          lastConnected: erpConnection.lastConnected
+        };
+        console.log("Formatted connection for command processor:", formattedConnection);
+      }
+
       // Process the command
-      const result = await handleVoiceCommand(command, erpConnection);
+      const result = await handleVoiceCommand(command, formattedConnection);
+      console.log("Command result:", result);
       
       setResultText(result);
       setVoiceState("result");

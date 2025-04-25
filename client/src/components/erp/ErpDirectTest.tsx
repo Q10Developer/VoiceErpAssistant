@@ -202,20 +202,43 @@ const ErpDirectTest = () => {
     
     setLoading(true);
     try {
+      // Log connection to see its format
+      console.log("Connection being passed to voice command handler:", connection);
+      
       // Test processing a voice command directly
       const command = "check inventory for product Plate";
-      const result = await handleVoiceCommand(command, connection);
+      
+      // Create a proper connection object with the required structure
+      const formattedConnection = {
+        id: connection.id,
+        userId: connection.userId,
+        url: connection.url,
+        apiKey: connection.apiKey,
+        apiSecret: connection.apiSecret,
+        isActive: connection.isActive,
+        lastConnected: connection.lastConnected
+      };
+      
+      console.log("Formatted connection:", formattedConnection);
+      
+      const result = await handleVoiceCommand(command, formattedConnection);
+      console.log("Voice command result:", result);
       
       setResults(prev => [
         { 
           command: `Voice Command: "${command}"`, 
           success: true, 
-          data: { response: result }, 
+          data: { 
+            connection: connection,
+            formattedConnection: formattedConnection,
+            response: result 
+          }, 
           message: result
         },
         ...prev
       ]);
     } catch (error) {
+      console.error("Error testing voice command:", error);
       setResults(prev => [
         { 
           command: 'Voice Command Test', 
