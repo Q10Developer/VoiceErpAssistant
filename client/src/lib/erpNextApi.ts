@@ -180,7 +180,7 @@ export const erpNextApi = {
         data: data.doc || {}
       };
     } catch (error) {
-      console.error("ERPNext create invoice error:", error);
+      console.error("QBS create invoice error:", error);
       return {
         success: false,
         message: (error as Error).message,
@@ -193,7 +193,7 @@ export const erpNextApi = {
   async getOpenOrders(connection: ErpConnection): Promise<ErpResponse<any[]>> {
     try {
       console.log("Getting open sales orders");
-      // Make actual API call to ERPNext through our proxy endpoint
+      // Make actual API call to QBS through our proxy endpoint
       const response = await apiRequest("POST", "/api/erp/query", {
         userId: connection.userId,
         connectionId: connection.id,
@@ -229,7 +229,7 @@ export const erpNextApi = {
         data: orders
       };
     } catch (error) {
-      console.error("ERPNext open orders error:", error);
+      console.error("QBS open orders error:", error);
       return {
         success: false,
         message: (error as Error).message,

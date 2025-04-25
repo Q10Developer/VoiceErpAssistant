@@ -17,7 +17,7 @@ const SettingsPage = () => {
   const { toast } = useToast();
   
   // Voice settings state
-  const [wakeWord, setWakeWord] = useState(voiceSettings?.wakeWord || "Hey ERP");
+  const [wakeWord, setWakeWord] = useState(voiceSettings?.wakeWord || "Hey QBS");
   const [sensitivity, setSensitivity] = useState<number[]>([voiceSettings?.sensitivity || 7]);
   const [voiceResponse, setVoiceResponse] = useState(voiceSettings?.voiceResponse || true);
   const [continuousListening, setContinuousListening] = useState(voiceSettings?.continuousListening || false);
