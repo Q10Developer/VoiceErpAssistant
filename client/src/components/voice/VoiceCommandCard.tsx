@@ -94,51 +94,49 @@ const VoiceCommandCard = () => {
         
         {/* Action buttons */}
         <div className="flex justify-center gap-4">
-          {!isListening ? (
-            <Button 
-              size="lg" 
-              onClick={startListening}
-              disabled={!isConnected && voiceState === "inactive"}
-              className="px-4 py-2 bg-primary hover:bg-primary/90"
-              variant="default"
+          <Button 
+            size="lg" 
+            onClick={startListening}
+            disabled={(isListening || voiceState === "processing") || (!isConnected && voiceState === "inactive")}
+            className="px-4 py-2 bg-primary hover:bg-primary/90"
+            variant="default"
+          >
+            <span className="mr-2">
+              <Mic className="h-5 w-5" />
+            </span>
+            Start Listening
+          </Button>
+
+          <Button 
+            size="lg" 
+            onClick={stopListening}
+            disabled={!isListening}
+            className="px-4 py-2 bg-error hover:bg-error/90"
+            variant="destructive"
+          >
+            <span className="mr-2">
+              <Square className="h-5 w-5" />
+            </span>
+            Stop Recording
+          </Button>
+          
+          {voiceState === "listening" && (
+            <Button
+              size="lg"
+              onClick={() => {
+                stopListening();
+                if (recognizedText.trim()) {
+                  processCommand(recognizedText.trim());
+                }
+              }}
+              disabled={!recognizedText.trim()}
+              className="px-4 py-2 bg-success hover:bg-success/90"
             >
               <span className="mr-2">
-                <Mic className="h-5 w-5" />
+                <Check className="h-5 w-5" />
               </span>
-              Start Listening
+              Process Command
             </Button>
-          ) : (
-            <>
-              <Button 
-                size="lg" 
-                onClick={stopListening}
-                className="px-4 py-2 bg-error hover:bg-error/90"
-                variant="destructive"
-              >
-                <span className="mr-2">
-                  <Square className="h-5 w-5" />
-                </span>
-                Stop Recording
-              </Button>
-              
-              {voiceState === "listening" && (
-                <Button
-                  size="lg"
-                  onClick={() => {
-                    stopListening();
-                    if (recognizedText.trim()) {
-                      processCommand(recognizedText.trim());
-                    }
-                  }}
-                  className="px-4 py-2 bg-success hover:bg-success/90"
-                >
-                  <span className="mr-2">
-                    <Check className="h-5 w-5" />
-                  </span>
-                  Process Command
-                </Button>
-              )}
-            </>
           )}
         </div>
       </CardContent>
