@@ -300,7 +300,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return res.status(400).json({ message: "Doctype and name are required for get_doc" });
             }
             
-            response = await axios.get(`${url}/api/resource/${doctype}/${name}`, {
+            // Use method API endpoint pattern since it's working
+            response = await axios.get(`${url}/api/method/frappe.client.get`, {
+              params: {
+                doctype: doctype,
+                name: name
+              },
               headers: {
                 'Authorization': `token ${apiKey}:${apiSecret}`
               }
@@ -312,8 +317,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return res.status(400).json({ message: "Doctype is required for get_list" });
             }
             
-            response = await axios.get(`${url}/api/resource/${doctype}`, {
+            // Use method API endpoint pattern since it's working
+            response = await axios.get(`${url}/api/method/frappe.client.get_list`, {
               params: {
+                doctype: doctype,
                 filters: filters ? JSON.stringify(filters) : undefined,
                 fields: fields ? JSON.stringify(fields) : undefined
               },
@@ -366,8 +373,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { url, apiKey, apiSecret } = connection;
       
       try {
-        // Create document in ERPNext
-        const response = await axios.post(`${url}/api/resource/${doctype}`, doc, {
+        // Use method API endpoint pattern since it's working
+        const response = await axios.post(`${url}/api/method/frappe.client.insert`, {
+          doc: {
+            doctype: doctype,
+            ...doc
+          }
+        }, {
           headers: {
             'Authorization': `token ${apiKey}:${apiSecret}`,
             'Content-Type': 'application/json'
