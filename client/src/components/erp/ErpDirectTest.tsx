@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Database, Package, ClipboardList, Plus, MessageSquare } from "lucide-react";
-import { erpNextApi } from '@/lib/erpNextApi';
-import { handleVoiceCommand } from '@/lib/erpCommands';
+import { qbsApi } from '@/lib/qbsApi';
+import { handleVoiceCommand } from '@/lib/qbsCommands';
 
 // Interface for the test result
 interface TestResult {
@@ -60,7 +60,7 @@ const ErpDirectTest = () => {
     
     setLoading(true);
     try {
-      const result = await erpNextApi.getInventory(connection, "Plate");
+      const result = await qbsApi.getInventory(connection, "Plate");
       setResults(prev => [
         { 
           command: 'Check Inventory for "Plate"', 
@@ -91,7 +91,7 @@ const ErpDirectTest = () => {
     
     setLoading(true);
     try {
-      const result = await erpNextApi.getOpenOrders(connection);
+      const result = await qbsApi.getOpenOrders(connection);
       setResults(prev => [
         { 
           command: 'Show Open Orders', 
@@ -122,7 +122,7 @@ const ErpDirectTest = () => {
     
     setLoading(true);
     try {
-      const result = await erpNextApi.createInvoice(connection, "Administrator");
+      const result = await qbsApi.createInvoice(connection, "Administrator");
       setResults(prev => [
         { 
           command: 'Create Invoice for "Administrator"', 

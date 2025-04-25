@@ -63,7 +63,7 @@ const Dashboard = () => {
         <CommandHistory />
       </div>
       
-      {/* ERPNext Direct API Test */}
+      {/* QBS Direct API Test */}
       <div className="mt-6">
         <ErpDirectTest />
       </div>
