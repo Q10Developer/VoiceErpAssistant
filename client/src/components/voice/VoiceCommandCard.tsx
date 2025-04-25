@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { Mic, Check, Settings, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,19 +18,7 @@ const VoiceCommandCard = () => {
   
   const { isConnected } = useErpContext();
   
-  const [buttonText, setButtonText] = useState("Start Listening");
-  
-  useEffect(() => {
-    setButtonText(isListening ? "Stop Listening" : "Start Listening");
-  }, [isListening]);
-  
-  const handleToggleMic = () => {
-    if (isListening) {
-      stopListening();
-    } else {
-      startListening();
-    }
-  };
+  // We now have separate buttons for start and stop, so we don't need the toggle effect
   
   return (
     <Card className="md:col-span-2">
@@ -107,39 +94,51 @@ const VoiceCommandCard = () => {
         
         {/* Action buttons */}
         <div className="flex justify-center gap-4">
-          <Button 
-            size="lg" 
-            onClick={handleToggleMic}
-            disabled={!isConnected && voiceState === "inactive"}
-            className={`px-4 py-2 ${isListening ? 'bg-error hover:bg-error/90' : 'bg-primary hover:bg-primary/90'}`}
-            variant={isListening ? "destructive" : "default"}
-          >
-            <span className="mr-2">
-              {isListening ? 
-                <Square className="h-5 w-5" />
-                : 
-                <Mic className="h-5 w-5" />
-              }
-            </span>
-            {buttonText}
-          </Button>
-          
-          {isListening && voiceState === "listening" && (
-            <Button
-              size="lg"
-              onClick={() => {
-                stopListening();
-                if (recognizedText.trim()) {
-                  processCommand(recognizedText.trim());
-                }
-              }}
-              className="px-4 py-2 bg-success hover:bg-success/90"
+          {!isListening ? (
+            <Button 
+              size="lg" 
+              onClick={startListening}
+              disabled={!isConnected && voiceState === "inactive"}
+              className="px-4 py-2 bg-primary hover:bg-primary/90"
+              variant="default"
             >
               <span className="mr-2">
-                <Check className="h-5 w-5" />
+                <Mic className="h-5 w-5" />
               </span>
-              Process Command
+              Start Listening
             </Button>
+          ) : (
+            <>
+              <Button 
+                size="lg" 
+                onClick={stopListening}
+                className="px-4 py-2 bg-error hover:bg-error/90"
+                variant="destructive"
+              >
+                <span className="mr-2">
+                  <Square className="h-5 w-5" />
+                </span>
+                Stop Recording
+              </Button>
+              
+              {voiceState === "listening" && (
+                <Button
+                  size="lg"
+                  onClick={() => {
+                    stopListening();
+                    if (recognizedText.trim()) {
+                      processCommand(recognizedText.trim());
+                    }
+                  }}
+                  className="px-4 py-2 bg-success hover:bg-success/90"
+                >
+                  <span className="mr-2">
+                    <Check className="h-5 w-5" />
+                  </span>
+                  Process Command
+                </Button>
+              )}
+            </>
           )}
         </div>
       </CardContent>
