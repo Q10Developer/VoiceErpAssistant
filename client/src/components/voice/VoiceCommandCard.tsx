@@ -1,10 +1,12 @@
-import { Mic, Check, Settings, Square } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Mic, Check, Settings, Square, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useVoiceContext } from "@/context/VoiceContext";
 import { useErpContext } from "@/context/ErpContext";
 import VoiceWaveform from "./VoiceWaveform";
 
+// This completely redesigned component includes a fixed set of controls
 const VoiceCommandCard = () => {
   const { 
     voiceState, 
@@ -17,8 +19,9 @@ const VoiceCommandCard = () => {
   } = useVoiceContext();
   
   const { isConnected } = useErpContext();
-  
-  // We now have separate buttons for start and stop, so we don't need the toggle effect
+
+  // Debugging state
+  const [showDebug, setShowDebug] = useState(false);
   
   return (
     <Card className="md:col-span-2">
@@ -91,53 +94,74 @@ const VoiceCommandCard = () => {
             </div>
           )}
         </div>
+
+        {/* Debug info - click on the heading to toggle */}
+        {showDebug && (
+          <div className="bg-gray-100 mb-4 p-2 text-xs">
+            <p>isListening: {isListening ? 'true' : 'false'}</p>
+            <p>voiceState: {voiceState}</p>
+            <p>Text: {recognizedText}</p>
+          </div>
+        )}
         
-        {/* Action buttons */}
-        <div className="flex justify-center gap-4">
+        {/* Action buttons - fixed layout with all buttons visible */}
+        <div className="grid grid-cols-3 gap-2 mb-2">
           <Button 
             size="lg" 
             onClick={startListening}
-            disabled={(isListening || voiceState === "processing") || (!isConnected && voiceState === "inactive")}
-            className="px-4 py-2 bg-primary hover:bg-primary/90"
+            disabled={isListening || voiceState === "processing"}
+            className="bg-primary hover:bg-primary/90"
             variant="default"
           >
             <span className="mr-2">
               <Mic className="h-5 w-5" />
             </span>
-            Start Listening
+            Start Recording
           </Button>
 
           <Button 
             size="lg" 
-            onClick={stopListening}
+            onClick={() => {
+              if (isListening) {
+                stopListening();
+              }
+            }}
             disabled={!isListening}
-            className="px-4 py-2 bg-error hover:bg-error/90"
+            className="bg-error hover:bg-error/90"
             variant="destructive"
           >
             <span className="mr-2">
-              <Square className="h-5 w-5" />
+              <XCircle className="h-5 w-5" />
             </span>
             Stop Recording
           </Button>
           
-          {voiceState === "listening" && (
-            <Button
-              size="lg"
-              onClick={() => {
-                stopListening();
-                if (recognizedText.trim()) {
-                  processCommand(recognizedText.trim());
-                }
-              }}
-              disabled={!recognizedText.trim()}
-              className="px-4 py-2 bg-success hover:bg-success/90"
-            >
-              <span className="mr-2">
-                <Check className="h-5 w-5" />
-              </span>
-              Process Command
-            </Button>
-          )}
+          <Button
+            size="lg"
+            onClick={() => {
+              stopListening();
+              if (recognizedText.trim()) {
+                processCommand(recognizedText.trim());
+              }
+            }}
+            disabled={!recognizedText.trim() || !isListening}
+            className="bg-success hover:bg-success/90"
+          >
+            <span className="mr-2">
+              <Check className="h-5 w-5" />
+            </span>
+            Process Command
+          </Button>
+        </div>
+
+        {/* Debug toggle */}
+        <div className="text-center">
+          <button 
+            onClick={() => setShowDebug(!showDebug)} 
+            className="text-xs text-gray-400 hover:text-gray-600"
+          >
+            {showDebug ? "Hide Debug" : "Show Debug"}
+          </button>
         </div>
       </CardContent>
     </Card>
