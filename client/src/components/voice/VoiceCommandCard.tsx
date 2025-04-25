@@ -31,7 +31,7 @@ const VoiceCommandCard = () => {
           className={`flex items-center text-sm ${isConnected ? 'text-success' : 'text-error'}`}
         >
           <span className={`w-2 h-2 rounded-full mr-2 ${isConnected ? 'bg-success' : 'bg-error'}`}></span>
-          {isConnected ? 'Connected to ERPNext' : 'Not connected to ERPNext'}
+          {isConnected ? 'Connected to QBS' : 'Not connected to QBS'}
         </div>
       </CardHeader>
       
@@ -44,7 +44,7 @@ const VoiceCommandCard = () => {
               <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center mb-4">
                 <Mic className="h-8 w-8 text-white" />
               </div>
-              <p className="text-center text-neutral-600 mb-2">Click the microphone or say "Hey ERP" to start</p>
+              <p className="text-center text-neutral-600 mb-2">Click the microphone or say "Hey QBS" to start</p>
               <div className="flex flex-wrap justify-center gap-2">
                 <p className="text-center text-sm bg-neutral-200 px-2 py-1 rounded-full text-neutral-600">"Check inventory"</p>
                 <p className="text-center text-sm bg-neutral-200 px-2 py-1 rounded-full text-neutral-600">"Create invoice"</p>

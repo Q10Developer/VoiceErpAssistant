@@ -6,7 +6,7 @@ const DEBUG = true;
 
 function logDebug(message: string, data?: any) {
   if (DEBUG) {
-    console.log(`[ERPCommand] ${message}`, data || '');
+    console.log(`[QBSCommand] ${message}`, data || '');
   }
 }
 

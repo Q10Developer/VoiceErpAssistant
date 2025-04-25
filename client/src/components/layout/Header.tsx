@@ -40,7 +40,7 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
               "inline-block w-2 h-2 rounded-full mr-2",
               isConnected ? "bg-success" : "bg-error"
             )} />
-            {isConnected ? "Connected to ERPNext" : "Not connected"}
+            {isConnected ? "Connected to QBS" : "Not connected"}
           </div>
           
           {/* Notification button */}

@@ -105,7 +105,7 @@ const Sidebar = ({ open, setOpen }: SidebarProps) => {
                 )}
               >
                 <Server className="mr-3 h-5 w-5 text-yellow-400" />
-                ERPNext Test Tool
+                QBS Test Tool
               </Link>
             </li>
             <li className="mb-1">
