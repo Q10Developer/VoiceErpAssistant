@@ -20,15 +20,23 @@ const QbsTestTool = () => {
     setError(null);
 
     try {
+      console.log("Testing QBS connection with:", { 
+        url, 
+        apiKey: apiKey ? "provided" : "missing", 
+        apiSecret: apiSecret ? "provided" : "missing" 
+      });
+      
       const response = await axios.post("/api/connection/test", {
         url,
         apiKey,
-        apiSecret
+        apiSecret,
       });
 
+      console.log("QBS test response:", response.data);
       setTestResult(response.data);
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || "An unknown error occurred");
+      console.error("Error testing connection:", err);
+      setError(err.response?.data?.message || err.message || "An error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -40,19 +48,17 @@ const QbsTestTool = () => {
 
     try {
       await axios.post("/api/connection", {
-        userId: 1, // Default user ID - would come from auth in a real app
-        url,
-        apiKey,
-        apiSecret,
-        isActive: true
+        userId: 1, // Fixed user ID for testing
+        url: url,
+        apiKey: apiKey,
+        apiSecret: apiSecret,
+        isActive: true,
       });
 
-      setTestResult({
-        success: true,
-        message: "Connection saved successfully"
-      });
+      setTestResult({ ...testResult, saved: true });
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || "An unknown error occurred");
+      console.error("Error saving connection:", err);
+      setError(err.response?.data?.message || err.message || "An error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -62,94 +68,101 @@ const QbsTestTool = () => {
     <Card className="w-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Server className="w-5 h-5" />
-          QBS Connection Test
+          <Server className="h-6 w-6" />
+          QBS Connection Tester
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">QBS Server URL</label>
+          <div className="grid gap-2">
+            <label htmlFor="url" className="text-sm font-medium">
+              QBS URL
+            </label>
             <Input
-              type="text"
+              id="url"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://qbs.example.com"
+              placeholder="https://your-qbs-instance.com"
+              className="w-full"
             />
+            <p className="text-xs text-gray-500">
+              Enter the base URL of your QBS instance without /app or trailing slashes
+            </p>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">API Key</label>
+          <div className="grid gap-2">
+            <label htmlFor="apiKey" className="text-sm font-medium">
+              API Key
+            </label>
             <Input
-              type="text"
+              id="apiKey"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
               placeholder="API Key"
+              className="w-full"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">API Secret</label>
+          <div className="grid gap-2">
+            <label htmlFor="apiSecret" className="text-sm font-medium">
+              API Secret
+            </label>
             <Input
-              type="password"
+              id="apiSecret"
               value={apiSecret}
               onChange={(e) => setApiSecret(e.target.value)}
               placeholder="API Secret"
+              className="w-full"
+              type="password"
             />
           </div>
 
-          <div className="flex gap-3">
-            <Button
-              onClick={testConnection}
-              disabled={isLoading}
-              className="flex-1"
-              variant="outline"
+          <div className="flex gap-2">
+            <Button 
+              onClick={testConnection} 
+              disabled={isLoading || !url || !apiKey || !apiSecret}
+              className="bg-blue-500 hover:bg-blue-600"
             >
-              {isLoading ? (
-                <>
-                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Testing...
-                </>
-              ) : (
-                "Test Connection"
-              )}
+              {isLoading ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Test Connection
             </Button>
-            <Button
-              onClick={saveConnection}
-              disabled={isLoading}
-              className="flex-1"
-            >
-              {isLoading ? (
-                <>
-                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Saving...
-                </>
-              ) : (
-                "Save Connection"
-              )}
-            </Button>
+            
+            {testResult?.success && (
+              <Button
+                onClick={saveConnection}
+                disabled={isLoading}
+                className="bg-green-500 hover:bg-green-600"
+              >
+                Save Connection
+              </Button>
+            )}
           </div>
 
-          {testResult && (
-            <div className={`p-3 rounded ${testResult.success ? "bg-green-100" : "bg-red-100"}`}>
-              <p className={`font-medium ${testResult.success ? "text-green-800" : "text-red-800"}`}>
-                {testResult.success ? "Connection Successful" : "Connection Failed"}
-              </p>
-              <p className="text-sm mt-1">
-                {testResult.message || (testResult.success ? "Connected to QBS successfully" : "Failed to connect to QBS")}
-              </p>
-              {testResult.user && (
-                <p className="text-sm mt-1">
-                  <span className="font-medium">Connected as:</span> {testResult.user}
-                </p>
-              )}
+          {error && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-md text-red-600">
+              <h3 className="font-medium mb-1">Error</h3>
+              <p className="text-sm">{error}</p>
             </div>
           )}
 
-          {error && (
-            <div className="p-3 rounded bg-red-100">
-              <p className="font-medium text-red-800">Error</p>
-              <p className="text-sm mt-1 text-red-800">{error}</p>
+          {testResult && (
+            <div className="p-4 bg-gray-50 border rounded-md">
+              <h3 className="font-medium mb-2">Connection Test Result</h3>
+              <pre className="text-sm bg-gray-100 p-3 rounded overflow-auto max-h-[300px]">
+                {JSON.stringify(testResult, null, 2)}
+              </pre>
             </div>
           )}
+          
+          <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+            <h3 className="font-medium mb-1">Troubleshooting Tips</h3>
+            <ul className="text-sm list-disc pl-5 space-y-1">
+              <li>The URL should be the base URL without "/app" at the end</li>
+              <li>Make sure both API Key and API Secret are complete and correct</li>
+              <li>Check that your QBS instance has API access enabled</li>
+              <li>Verify that the user associated with the API key has sufficient permissions</li>
+            </ul>
+          </div>
         </div>
       </CardContent>
     </Card>
