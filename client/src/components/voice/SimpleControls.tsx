@@ -79,16 +79,85 @@ const SimpleControls = () => {
   // Start speech recognition
   const startRecording = () => {
     try {
-      if (recognitionRef.current) {
-        recognitionRef.current.start();
-        setIsRecording(true);
-        setResult("");
-      } else {
-        setResult("Speech recognition is not supported in your browser");
+      // Clear any previous results
+      setResult("");
+      setTranscript("");
+      
+      // Check for browser support again just to be safe
+      const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
+      
+      if (!SpeechRecognition) {
+        setResult("Speech recognition is not supported in your browser. Please try Chrome or Edge.");
+        return;
       }
+      
+      // If we need to create a new recognition object
+      if (!recognitionRef.current) {
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = true;
+        recognitionRef.current.interimResults = true;
+        recognitionRef.current.lang = 'en-US';
+        
+        recognitionRef.current.onresult = (event: any) => {
+          let interimTranscript = '';
+          let finalTranscript = '';
+          
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            
+            if (event.results[i].isFinal) {
+              finalTranscript += transcript;
+              console.log("Final transcript:", transcript);
+            } else {
+              interimTranscript += transcript;
+              console.log("Interim transcript:", transcript);
+            }
+          }
+          
+          // Update input field with transcript
+          if (finalTranscript) {
+            console.log("Setting input text to final transcript:", finalTranscript);
+            setInputText(finalTranscript);
+            setTranscript(finalTranscript);
+          } else if (interimTranscript) {
+            console.log("Setting transcript to interim:", interimTranscript);
+            setTranscript(interimTranscript);
+            // Also update the input field in real-time so users see what's being recognized
+            setInputText(interimTranscript);
+          }
+        };
+        
+        recognitionRef.current.onerror = (event: any) => {
+          console.error('Speech recognition error', event.error);
+          if (event.error === 'no-speech') {
+            setResult("No speech detected. Please try speaking louder or check your microphone.");
+          } else if (event.error === 'audio-capture') {
+            setResult("No microphone detected. Please connect a microphone and try again.");
+          } else if (event.error === 'not-allowed') {
+            setResult("Microphone access denied. Please allow microphone access in your browser settings.");
+          } else {
+            setResult(`Speech recognition error: ${event.error}`);
+          }
+          setIsRecording(false);
+        };
+        
+        recognitionRef.current.onend = () => {
+          console.log('Speech recognition ended');
+          setIsRecording(false);
+        };
+      }
+      
+      console.log("Starting speech recognition...");
+      recognitionRef.current.start();
+      setIsRecording(true);
+      
+      // Show user a message
+      setResult("Listening... Please speak your command clearly.");
+      
     } catch (error) {
       console.error('Error starting speech recognition:', error);
-      setResult(`Error: ${(error as Error).message}`);
+      setResult(`Error starting speech recognition: ${(error as Error).message}`);
+      setIsRecording(false);
     }
   };
   
@@ -303,6 +372,17 @@ const SimpleControls = () => {
       </div>
       
       <div className="p-6">
+        {/* Browser compatibility notice */}
+        <div className="mb-5 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+          <h3 className="text-sm font-medium text-amber-800 mb-1">📣 Voice Recognition Requirements:</h3>
+          <ul className="text-xs text-amber-700 list-disc pl-5 space-y-1">
+            <li>Use <b>Chrome</b> or <b>Edge</b> browser for best compatibility</li>
+            <li>Allow <b>microphone permissions</b> when prompted</li>
+            <li>Speak <b>clearly</b> after clicking "Start Listening"</li>
+            <li>If voice doesn't work, you can always <b>type commands</b> directly</li>
+          </ul>
+        </div>
+      
         {/* Command suggestions */}
         <div className="mb-5">
           <h3 className="text-sm font-medium text-gray-500 mb-2">Try these commands:</h3>
