@@ -269,16 +269,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ERPNext API proxy route
+  // ERPNext API proxy route for queries
   app.post(`${apiPrefix}/erp/query`, async (req, res) => {
     try {
-      const { userId, method, doctype, name, filters, fields } = req.body;
+      const { userId, connectionId, method, doctype, name, filters, fields } = req.body;
       
-      if (!userId || !method) {
-        return res.status(400).json({ message: "User ID and method are required" });
+      if (!userId) {
+        return res.status(400).json({ message: "User ID is required" });
       }
       
-      const connection = await storage.getErpConnection(parseInt(userId));
+      const connection = connectionId 
+        ? await storage.getErpConnection(parseInt(userId)) 
+        : await storage.getErpConnection(parseInt(userId));
       
       if (!connection) {
         return res.status(404).json({ message: "ERP connection not found" });
@@ -289,7 +291,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         let response;
         
-        switch (method) {
+        // Default to get_list if method is not specified
+        const apiMethod = method || 'get_list';
+        
+        switch (apiMethod) {
           case 'get_doc':
             if (!doctype || !name) {
               return res.status(400).json({ message: "Doctype and name are required for get_doc" });
@@ -338,6 +343,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     } catch (error) {
       res.status(500).json({ message: "Failed to query ERPNext API", error: (error as Error).message });
+    }
+  });
+  
+  // ERPNext API proxy route for creating documents
+  app.post(`${apiPrefix}/erp/create`, async (req, res) => {
+    try {
+      const { userId, connectionId, doctype, doc } = req.body;
+      
+      if (!userId || !doctype || !doc) {
+        return res.status(400).json({ message: "User ID, doctype, and document data are required" });
+      }
+      
+      const connection = connectionId 
+        ? await storage.getErpConnection(parseInt(userId)) 
+        : await storage.getErpConnection(parseInt(userId));
+      
+      if (!connection) {
+        return res.status(404).json({ message: "ERP connection not found" });
+      }
+      
+      const { url, apiKey, apiSecret } = connection;
+      
+      try {
+        // Create document in ERPNext
+        const response = await axios.post(`${url}/api/resource/${doctype}`, doc, {
+          headers: {
+            'Authorization': `token ${apiKey}:${apiSecret}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        res.json({
+          success: true,
+          message: `${doctype} created successfully`,
+          doc: response.data.data
+        });
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          return res.status(error.response?.status || 500).json({ 
+            success: false,
+            message: "ERPNext API error", 
+            error: error.response?.data || error.message 
+          });
+        }
+        
+        res.status(500).json({ 
+          success: false,
+          message: "ERPNext API error", 
+          error: (error as Error).message 
+        });
+      }
+    } catch (error) {
+      res.status(500).json({ 
+        success: false,
+        message: "Failed to create document in ERPNext", 
+        error: (error as Error).message 
+      });
     }
   });
 
