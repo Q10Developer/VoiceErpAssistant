@@ -26,6 +26,16 @@ const SimpleControls = () => {
     // Initialize speech synthesis
     if (window.speechSynthesis) {
       speechSynthesisRef.current = window.speechSynthesis;
+      
+      // Preload voices
+      if (speechSynthesisRef.current.onvoiceschanged !== undefined) {
+        speechSynthesisRef.current.onvoiceschanged = () => {
+          console.log("Voices loaded:", speechSynthesisRef.current?.getVoices().length);
+        };
+      }
+      
+      // Force voices to load
+      speechSynthesisRef.current.getVoices();
     } else {
       console.error('Speech synthesis not supported in this browser');
     }
@@ -162,7 +172,7 @@ const SimpleControls = () => {
       setIsRecording(true);
       
       // Show user a message
-      setResult("Listening... Please speak your command clearly.");
+      setResult("Listening...");
       
     } catch (error) {
       console.error('Error starting speech recognition:', error);
@@ -389,9 +399,30 @@ const SimpleControls = () => {
       if (isSpeechEnabled && speechSynthesisRef.current && !isSpeaking) {
         try {
           const utterance = new SpeechSynthesisUtterance(speechText);
-          utterance.rate = 1.0;
-          utterance.pitch = 1.0;
-          utterance.volume = 1.0;
+          utterance.rate = 0.95;
+          utterance.pitch = 0.9;
+          utterance.volume = 0.85;
+          
+          // Try to find a different, more natural voice - not the default one
+          if (speechSynthesisRef.current) {
+            const voices = speechSynthesisRef.current.getVoices();
+            // Look for English female voices first as they tend to sound more natural
+            const femaleVoice = voices.find(voice => 
+              voice.name.includes('female') || 
+              voice.name.includes('Samantha') || 
+              voice.name.includes('Zira') || 
+              voice.name.includes('Karen'));
+              
+            if (femaleVoice) {
+              utterance.voice = femaleVoice;
+            } else {
+              // If no specific female voice, try another non-default voice
+              const alternativeVoice = voices.find(voice => !voice.default);
+              if (alternativeVoice) {
+                utterance.voice = alternativeVoice;
+              }
+            }
+          }
           
           // Add event handlers
           utterance.onstart = () => {
