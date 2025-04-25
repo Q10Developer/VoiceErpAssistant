@@ -1,5 +1,5 @@
 import { queryClient } from "./queryClient";
-import { erpNextApi } from "./erpNextApi";
+import { qbsApi } from "./qbsApi";
 
 // For debugging purposes
 const DEBUG = true;
@@ -81,7 +81,7 @@ async function handleInventoryCheck(command: string, erpConnection: ErpConnectio
   
   try {
     logDebug("Calling QBS API for inventory", { productName });
-    const response = await erpNextApi.getInventory(erpConnection, productName);
+    const response = await qbsApi.getInventory(erpConnection, productName);
     logDebug("QBS inventory response", response);
     
     if (response.success) {
@@ -119,7 +119,7 @@ async function handleCreateInvoice(command: string, erpConnection: ErpConnection
   
   try {
     logDebug("Calling QBS API to create invoice", { customerName });
-    const response = await erpNextApi.createInvoice(erpConnection, customerName);
+    const response = await qbsApi.createInvoice(erpConnection, customerName);
     logDebug("QBS create invoice response", response);
     
     if (response.success) {
@@ -143,8 +143,8 @@ async function handleShowOpenOrders(erpConnection: ErpConnection | null): Promis
   
   try {
     logDebug("Calling QBS API for open orders");
-    const response = await erpNextApi.getOpenOrders(erpConnection);
-    logDebug("ERPNext open orders response", response);
+    const response = await qbsApi.getOpenOrders(erpConnection);
+    logDebug("QBS open orders response", response);
     
     if (response.success) {
       if (response.data.length === 0) {
