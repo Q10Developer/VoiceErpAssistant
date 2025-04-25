@@ -489,7 +489,7 @@ const SimpleControls = () => {
           <ul className="text-xs text-amber-700 list-disc pl-5 space-y-1">
             <li>Use <b>Chrome</b> or <b>Edge</b> browser for best compatibility</li>
             <li>Allow <b>microphone permissions</b> when prompted</li>
-            <li>Speak <b>clearly</b> after clicking "Start Listening"</li>
+            <li>Share your command after clicking "Start Listening"</li>
             <li>If voice doesn't work, you can always <b>type commands</b> directly</li>
           </ul>
         </div>
@@ -561,7 +561,7 @@ const SimpleControls = () => {
           {isRecording && (
             <div className="mt-2 px-3 py-2 bg-blue-50 rounded-lg border border-blue-100 text-sm">
               <p className="font-medium text-blue-700 mb-1">Listening...</p>
-              <p className="text-blue-600 italic">{transcript ? `"${transcript}"` : "Say something..."}</p>
+              <p className="text-blue-600 italic">{transcript ? `"${transcript}"` : "Waiting for your command..."}</p>
             </div>
           )}
         </div>
