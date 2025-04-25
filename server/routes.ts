@@ -227,7 +227,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Test connection to ERPNext
+  // Test connection to QBS
   app.post(`${apiPrefix}/connection/test`, async (req, res) => {
     try {
       const { url, apiKey, apiSecret } = req.body;
@@ -237,7 +237,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       try {
-        // Test connection to ERPNext API
+        // Test connection to QBS API
         const response = await axios.get(`${url}/api/method/frappe.auth.get_logged_user`, {
           headers: {
             'Authorization': `token ${apiKey}:${apiSecret}`
@@ -248,19 +248,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.json({ success: true, user: response.data.message });
         }
         
-        res.status(400).json({ success: false, message: "Invalid response from ERPNext API" });
+        res.status(400).json({ success: false, message: "Invalid response from QBS API" });
       } catch (error) {
         if (axios.isAxiosError(error)) {
           return res.status(400).json({ 
             success: false, 
-            message: "Failed to connect to ERPNext API", 
+            message: "Failed to connect to QBS API", 
             error: error.response?.data || error.message 
           });
         }
         
         res.status(400).json({ 
           success: false, 
-          message: "Failed to connect to ERPNext API", 
+          message: "Failed to connect to QBS API", 
           error: (error as Error).message 
         });
       }
@@ -269,7 +269,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ERPNext API proxy route for queries
+  // QBS API proxy route for queries
   app.post(`${apiPrefix}/erp/query`, async (req, res) => {
     try {
       const { userId, connectionId, method, doctype, name, filters, fields } = req.body;
@@ -283,7 +283,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         : await storage.getErpConnection(parseInt(userId));
       
       if (!connection) {
-        return res.status(404).json({ message: "ERP connection not found" });
+        return res.status(404).json({ message: "QBS connection not found" });
       }
       
       const { url, apiKey, apiSecret } = connection;
@@ -319,7 +319,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             // Use method API endpoint pattern since it's working
             // Adding more debug logging to see what's happening
-            console.log("Querying ERPNext API with params:", {
+            console.log("Querying QBS API with params:", {
               doctype,
               filters: filters ? JSON.stringify(filters) : undefined,
               fields: fields ? JSON.stringify(fields) : undefined
@@ -343,10 +343,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         
         // Log the response data for debugging
-        console.log("ERPNext API response:", response.data);
+        console.log("QBS API response:", response.data);
         
         // Properly format the response
-        // ERPNext method API usually returns data in the "message" field
+        // QBS method API usually returns data in the "message" field
         res.json({
           success: true,
           message: "Query successful",
@@ -355,22 +355,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } catch (error) {
         if (axios.isAxiosError(error)) {
           return res.status(error.response?.status || 500).json({ 
-            message: "ERPNext API error", 
+            message: "QBS API error", 
             error: error.response?.data || error.message 
           });
         }
         
         res.status(500).json({ 
-          message: "ERPNext API error", 
+          message: "QBS API error", 
           error: (error as Error).message 
         });
       }
     } catch (error) {
-      res.status(500).json({ message: "Failed to query ERPNext API", error: (error as Error).message });
+      res.status(500).json({ message: "Failed to query QBS API", error: (error as Error).message });
     }
   });
   
-  // ERPNext API proxy route for creating documents
+  // QBS API proxy route for creating documents
   app.post(`${apiPrefix}/erp/create`, async (req, res) => {
     try {
       const { userId, connectionId, doctype, doc } = req.body;
@@ -384,7 +384,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         : await storage.getErpConnection(parseInt(userId));
       
       if (!connection) {
-        return res.status(404).json({ message: "ERP connection not found" });
+        return res.status(404).json({ message: "QBS connection not found" });
       }
       
       const { url, apiKey, apiSecret } = connection;
@@ -392,7 +392,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         // Use method API endpoint pattern since it's working
         // Add debug logging
-        console.log("Creating document in ERPNext:", {
+        console.log("Creating document in QBS:", {
           doctype,
           doc
         });
@@ -415,7 +415,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         );
         
-        console.log("ERPNext insert response:", response.data);
+        console.log("QBS insert response:", response.data);
         
         res.json({
           success: true,
@@ -426,21 +426,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (axios.isAxiosError(error)) {
           return res.status(error.response?.status || 500).json({ 
             success: false,
-            message: "ERPNext API error", 
+            message: "QBS API error", 
             error: error.response?.data || error.message 
           });
         }
         
         res.status(500).json({ 
           success: false,
-          message: "ERPNext API error", 
+          message: "QBS API error", 
           error: (error as Error).message 
         });
       }
     } catch (error) {
       res.status(500).json({ 
         success: false,
-        message: "Failed to create document in ERPNext", 
+        message: "Failed to create document in QBS", 
         error: (error as Error).message 
       });
     }
