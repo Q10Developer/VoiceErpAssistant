@@ -79,7 +79,7 @@ export function ErpProvider({ children }: { children: ReactNode }) {
       refetch();
       toast({
         title: "Connection saved",
-        description: "Your ERPNext connection has been saved.",
+        description: "Your QBS connection has been saved.",
       });
       setIsConnected(true);
     },
@@ -93,7 +93,7 @@ export function ErpProvider({ children }: { children: ReactNode }) {
     }
   });
 
-  // Test connection to ERPNext
+  // Test connection to QBS
   const testConnection = async (url: string, apiKey: string, apiSecret: string) => {
     try {
       return await testConnectionMutation.mutateAsync({ url, apiKey, apiSecret });
@@ -105,7 +105,7 @@ export function ErpProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Save connection to ERPNext
+  // Save connection to QBS
   const saveConnection = async (url: string, apiKey: string, apiSecret: string) => {
     await saveConnectionMutation.mutateAsync({
       userId,

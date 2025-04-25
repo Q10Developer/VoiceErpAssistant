@@ -71,7 +71,7 @@ const SettingsPage = () => {
     }
   };
   
-  // Test ERPNext connection
+  // Test QBS connection
   const handleTestConnection = async () => {
     if (!erpUrl || !apiKey || !apiSecret) {
       toast({
@@ -97,7 +97,7 @@ const SettingsPage = () => {
       } else {
         toast({
           title: "Connection failed",
-          description: result.message || "Could not connect to ERPNext",
+          description: result.message || "Could not connect to QBS",
           variant: "destructive"
         });
       }
@@ -117,7 +117,7 @@ const SettingsPage = () => {
     }
   };
   
-  // Save ERPNext connection
+  // Save QBS connection
   const handleSaveConnection = async () => {
     if (!erpUrl || !apiKey || !apiSecret) {
       toast({
@@ -241,19 +241,19 @@ const SettingsPage = () => {
           </CardFooter>
         </Card>
         
-        {/* ERPNext Connection Settings */}
+        {/* QBS Connection Settings */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg font-medium text-neutral-800">ERPNext Connection</CardTitle>
+            <CardTitle className="text-lg font-medium text-neutral-800">QBS Connection</CardTitle>
           </CardHeader>
           
           <CardContent className="space-y-6">
             {isConnected && (
               <Alert variant="success" className="bg-success/10 border-success text-success">
                 <Check className="h-4 w-4" />
-                <AlertTitle>Connected to ERPNext</AlertTitle>
+                <AlertTitle>Connected to QBS</AlertTitle>
                 <AlertDescription>
-                  Your voice assistant is connected to ERPNext. You can update your connection settings below.
+                  Your voice assistant is connected to QBS. You can update your connection settings below.
                 </AlertDescription>
               </Alert>
             )}
@@ -263,23 +263,23 @@ const SettingsPage = () => {
                 <Info className="h-4 w-4" />
                 <AlertTitle>Not connected</AlertTitle>
                 <AlertDescription>
-                  Connect to your ERPNext instance to enable voice commands.
+                  Connect to your QBS instance to enable voice commands.
                 </AlertDescription>
               </Alert>
             )}
             
-            {/* ERPNext URL */}
+            {/* QBS URL */}
             <div>
-              <Label htmlFor="erp-url">ERPNext URL</Label>
+              <Label htmlFor="erp-url">QBS URL</Label>
               <Input 
                 id="erp-url"
                 value={erpUrl} 
                 onChange={(e) => setErpUrl(e.target.value)}
-                placeholder="https://your-erpnext-instance.com"
+                placeholder="https://your-qbs-instance.com"
                 className="mt-1"
               />
               <p className="mt-1 text-xs text-neutral-500">
-                The URL of your ERPNext instance (e.g., https://your-erpnext-instance.com)
+                The URL of your QBS instance (e.g., https://your-qbs-instance.com)
               </p>
             </div>
             
@@ -290,7 +290,7 @@ const SettingsPage = () => {
                 id="api-key"
                 value={apiKey} 
                 onChange={(e) => setApiKey(e.target.value)}
-                placeholder="Your ERPNext API Key"
+                placeholder="Your QBS API Key"
                 className="mt-1"
               />
             </div>
@@ -303,11 +303,11 @@ const SettingsPage = () => {
                 type="password"
                 value={apiSecret} 
                 onChange={(e) => setApiSecret(e.target.value)}
-                placeholder={erpConnection ? "••••••••••••••••" : "Your ERPNext API Secret"}
+                placeholder={erpConnection ? "••••••••••••••••" : "Your QBS API Secret"}
                 className="mt-1"
               />
               <p className="mt-1 text-xs text-neutral-500">
-                {erpConnection ? "Leave blank to keep the existing API secret" : "Your ERPNext API secret"}
+                {erpConnection ? "Leave blank to keep the existing API secret" : "Your QBS API secret"}
               </p>
             </div>
             
