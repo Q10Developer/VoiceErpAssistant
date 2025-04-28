@@ -1,0 +1,36 @@
+pm2 logs simple-server --lines 50
+[TAILING] Tailing last 50 lines for [simple-server] process (change the value with --lines option)
+/root/.pm2/logs/simple-server-out.log last 50 lines:
+/root/.pm2/logs/simple-server-error.log last 50 lines:
+1|simple-s |     at Server.setupListenHandle [as _listen2] (node:net:1817:16)
+1|simple-s |     at listenInCluster (node:net:1865:12)
+1|simple-s |     at Server.listen (node:net:1953:7)
+1|simple-s |     at Function.listen (/var/www/qbsvoice/VoiceErpAssistant/node_modules/express/lib/application.js:635:24)
+1|simple-s |     at Object.<anonymous> (/var/www/qbsvoice/VoiceErpAssistant/simple-server.js:86:5)
+1|simple-s |     at Module._compile (node:internal/modules/cjs/loader:1364:14)
+1|simple-s |     at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+1|simple-s |     at Module.load (node:internal/modules/cjs/loader:1203:32)
+1|simple-s |     at Module._load (node:internal/modules/cjs/loader:1019:12)
+1|simple-s |     at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/ProcessContainerFork.js:33:23) {
+1|simple-s |   code: 'EADDRINUSE',
+1|simple-s |   errno: -98,
+1|simple-s |   syscall: 'listen',
+1|simple-s |   address: '::',
+1|simple-s |   port: 5000
+1|simple-s | }
+1|simple-s | Error: listen EADDRINUSE: address already in use :::5000
+1|simple-s |     at Server.setupListenHandle [as _listen2] (node:net:1817:16)
+1|simple-s |     at listenInCluster (node:net:1865:12)
+1|simple-s |     at Server.listen (node:net:1953:7)
+1|simple-s |     at Function.listen (/var/www/qbsvoice/VoiceErpAssistant/node_modules/express/lib/application.js:635:24)
+1|simple-s |     at Object.<anonymous> (/var/www/qbsvoice/VoiceErpAssistant/simple-server.js:86:5)
+1|simple-s |     at Module._compile (node:internal/modules/cjs/loader:1364:14)
+1|simple-s |     at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+1|simple-s |     at Module.load (node:internal/modules/cjs/loader:1203:32)
+1|simple-s |     at Module._load (node:internal/modules/cjs/loader:1019:12)
+1|simple-s |     at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/ProcessContainerFork.js:33:23) {
+1|simple-s |   code: 'EADDRINUSE',
+1|simple-s |   errno: -98,
+1|simple-s |   syscall: 'listen',
+1|simple-s |   address: '::',
+1|simple-s |   port: 5000
